@@ -36,8 +36,8 @@ L.Socket = L.Class.extend({
 	connect: function(socket) {
 		var map = this._map;
 		if (map.options.permission) {
-			if(!map.options.docParams){
-				map.options.docParams = {}
+			if (!map.options.docParams) {
+				map.options.docParams = {};
 			}
 			map.options.docParams['permission'] = map.options.permission;
 		}
