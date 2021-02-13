@@ -202,7 +202,7 @@ L.Control.Menubar = L.Control.extend({
 				{uno: '.uno:TitlePageDialog'},
 				{uno: '.uno:FormatColumns'},
 				{uno: '.uno:Watermark'},
-				{uno: '.uno:EditRegion'},
+				//{uno: '.uno:EditRegion'},
 				{type: 'separator'},
 				{uno: '.uno:TransformDialog'},
 				{uno: '.uno:FormatLine'},
