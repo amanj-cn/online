@@ -1,401 +1,534 @@
 <!DOCTYPE html>
-
 <!-- Proof of concept of running loleaflet.html in an iframe. Also
-     shows how to, from outside the iframe, invoke Python scripting in
-     the underlying LibreOffice instance that manipulates the document
-     being edited.
-
-     This demonstrates using the Python InsertText.py and Capitalise.py
-     scripts from javascript across iframes.
--->
-
+  shows how to, from outside the iframe, invoke Python scripting in
+  the underlying LibreOffice instance that manipulates the document
+  being edited.
+  
+  This demonstrates using the Python InsertText.py and Capitalise.py
+  scripts from javascript across iframes.
+  -->
 <html>
-
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Online Editor</title>
-
-  <style>
-    .alert {
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Online Editor</title>
+    <style>
+      .alert {
       font-size: large;
       padding: 20px;
       background-color: #f44336;
       color: white;
       margin-bottom: 15px;
-    }
-  </style>
-
-  <script>
-
-    function post(msg) {
-      window.frames[0].postMessage(JSON.stringify(msg), '*');
-    }
-
-    function insertText(text) {
-      post({
-        'MessageId': 'CallPythonScript',
-        'SendTime': Date.now(),
-        'ScriptFile': 'InsertText.py',
-        'Function': 'InsertText',
-        'Values': { 'text': { 'type': 'string', 'value': text } }
-      });
-    }
-
-    function capitalize() {
-      post({
-        'MessageId': 'CallPythonScript',
-        'SendTime': Date.now(),
-        'ScriptFile': 'Capitalise.py',
-        'Function': 'capitalisePython',
-        'Values': null
-      });
-    }
-
-    function save() {
-      post({
-        'MessageId': 'Action_Save',
-        'Values': { 'Notify': true, 'ExtendedData': 'CustomFlag=Custom Value;AnotherFlag=AnotherValue' }
-      });
-    }
-
-    function closeDocument() {
-      post({
-        'MessageId': 'Action_Close',
-        'Values': null
-      });
-    }
-
-    function hide_commands(id) {
-      post({
-        'MessageId': 'Hide_Menu_Item',
-        'Values': { 'id': id, }
-      });
-      post({
-        'MessageId': 'Hide_Button',
-        'Values': { 'id': id, }
-      });
-    }
-
-    function show_commands(id) {
-      post({
-        'MessageId': 'Show_Menu_Item',
-        'Values': { 'id': id, }
-      });
-      post({
-        'MessageId': 'Show_Button',
-        'Values': { 'id': id, }
-      });
-    }
-
-    function disable_default_uiaction(action, disable) {
-      post({
-        'MessageId': 'Disable_Default_UIAction',
-        'Values': { 'action': action, 'disable': disable }
-      });
-    }
-
-    function ShowMenubar(visible) {
-      var messageId = visible ? 'Show_Menubar' : 'Hide_Menubar';
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': messageId }), '*');
-    }
-
-    function insertLockButton() {
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-      window.frames[0].postMessage(JSON.stringify({
-        'MessageId': 'Insert_Button',
-        'Values': {
-          'id': 'CN_Button1',
-          'imgurl': 'images/lock.png',
-          'hint': 'Lock Section',
-          'mobile': true,
-          'label': 'Lock Section',
-          'insertBefore': 'undo'
-        }
-      }),
-        '*');
-    }
-
-    function insertDeleteButton() {
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-      window.frames[0].postMessage(JSON.stringify({
-        'MessageId': 'Insert_Button',
-        'Values': {
-          'id': 'CN_Button2',
-          'imgurl': 'images/trash.png',
-          'hint': 'Delete Section',
-          'mobile': true,
-          'label': 'Delete Section',
-          'insertBefore': 'undo'
-        }
-      }),
-        '*');
-    }
-
-    function insertShareButton() {
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-      window.frames[0].postMessage(JSON.stringify({
-        'MessageId': 'Insert_Button',
-        'Values': {
-          'id': 'CN_Button3',
-          'imgurl': 'images/share.png',
-          'hint': 'Share Document',
-          'mobile': true,
-          'label': 'Share Document',
-          'insertBefore': 'print'
-        }
-      }),
-        '*');
-    }
-
-    function hideButton() {
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-      window.frames[0].postMessage(JSON.stringify({
-        'MessageId': 'Hide_Button',
-        'Values': { 'id': 'CN_Button1' }
-      }),
-        '*');
-    }
-
-    function showButton() {
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-      window.frames[0].postMessage(JSON.stringify({
-        'MessageId': 'Show_Button',
-        'Values': { 'id': 'CN_Button1' }
-      }),
-        '*');
-    }
-
-    // This function is invoked when the iframe posts a message back.
-
-    function receiveMessage(event) {
-      console.log("Adding buttons");
-      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-      insertLockButton();
-      //insertDeleteButton();
-      // insertShareButton();
-      console.log('==== framed.doc.html receiveMessage: ' + event.data);
-      var msg = JSON.parse(event.data);
-      if (!msg) {
-        console.log('empty')
-        return;
       }
-      if (msg.MessageId == 'App_LoadingStatus') {
-        if (msg.Values) {
-          if (msg.Values.Status == 'Document_Loaded') {
-            console.log("Adding buttons");
-            window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
-            insertLockButton();
-            //insertDeleteButton();
-            // insertShareButton();
+    </style>
+    <script>
+      function post(msg) {
+        window.frames[0].postMessage(JSON.stringify(msg), '*');
+      }
+      
+      function insertText(text) {
+        post({
+          'MessageId': 'CallPythonScript',
+          'SendTime': Date.now(),
+          'ScriptFile': 'InsertText.py',
+          'Function': 'InsertText',
+          'Values': { 'text': { 'type': 'string', 'value': text } }
+        });
+      }
+      
+      function capitalize() {
+        post({
+          'MessageId': 'CallPythonScript',
+          'SendTime': Date.now(),
+          'ScriptFile': 'Capitalise.py',
+          'Function': 'capitalisePython',
+          'Values': null
+        });
+      }
+      
+      function save() {
+        post({
+          'MessageId': 'Action_Save',
+          'Values': { 'Notify': true, 'ExtendedData': 'CustomFlag=Custom Value;AnotherFlag=AnotherValue' }
+        });
+      }
+      
+      function closeDocument() {
+        post({
+          'MessageId': 'Action_Close',
+          'Values': null
+        });
+      }
+      
+      function hide_commands(id) {
+        post({
+          'MessageId': 'Hide_Menu_Item',
+          'Values': { 'id': id, }
+        });
+        post({
+          'MessageId': 'Hide_Button',
+          'Values': { 'id': id, }
+        });
+      }
+      
+      function show_commands(id) {
+        post({
+          'MessageId': 'Show_Menu_Item',
+          'Values': { 'id': id, }
+        });
+        post({
+          'MessageId': 'Show_Button',
+          'Values': { 'id': id, }
+        });
+      }
+      
+      function disable_default_uiaction(action, disable) {
+        post({
+          'MessageId': 'Disable_Default_UIAction',
+          'Values': { 'action': action, 'disable': disable }
+        });
+      }
+      
+      function ShowMenubar(visible) {
+        var messageId = visible ? 'Show_Menubar' : 'Hide_Menubar';
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': messageId }), '*');
+      }
+      
+      function insertLockButton() {
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+        window.frames[0].postMessage(JSON.stringify({
+          'MessageId': 'Insert_Button',
+          'Values': {
+            'id': 'CN_Button_Lock',
+            'imgurl': 'images/lock.png',
+            'hint': 'Lock Section',
+            'mobile': true,
+            'label': 'Lock Section',
+            'insertBefore': 'undo'
           }
+        }),
+          '*');
+      }
+      
+      function insertDeleteButton() {
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+        window.frames[0].postMessage(JSON.stringify({
+          'MessageId': 'Insert_Button',
+          'Values': {
+            'id': 'CN_Button_Delete',
+            'imgurl': 'images/trash.png',
+            'hint': 'Delete Section',
+            'mobile': true,
+            'label': 'Delete Section',
+            'insertBefore': 'undo'
+          }
+        }),
+          '*');
+      }
+      
+      function insertShareButton() {
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+        window.frames[0].postMessage(JSON.stringify({
+          'MessageId': 'Insert_Button',
+          'Values': {
+            'id': 'CN_Button_Share',
+            'imgurl': 'images/share.png',
+            'hint': 'Share Document',
+            'mobile': true,
+            'label': 'Share Document',
+            'insertBefore': 'print'
+          }
+        }),
+          '*');
+      }
+      
+      function insertUnlockButton() {
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+        window.frames[0].postMessage(JSON.stringify({
+          'MessageId': 'Insert_Button',
+          'Values': {
+            'id': 'CN_Button_Unlock',
+            'imgurl': 'images/unlock.png',
+            'hint': 'Unlock Section',
+            'mobile': true,
+            'label': 'Unlock Section',
+            'insertBefore': 'undo'
+          }
+        }),
+          '*');
+      }
+      
+      function hideButton() {
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+        window.frames[0].postMessage(JSON.stringify({
+          'MessageId': 'Hide_Button',
+          'Values': { 'id': 'CN_Button_Lock' }
+        }),
+          '*');
+      }
+      
+      function showButton() {
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+        window.frames[0].postMessage(JSON.stringify({
+          'MessageId': 'Show_Button',
+          'Values': { 'id': 'CN_Button_Lock' }
+        }),
+          '*');
+      }
+      
+      // This function is invoked when the iframe posts a message back.
+      
+      function receiveMessage(event) {
+        console.log("Adding buttons");
+        window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+      
+        console.log('==== framed.doc.html receiveMessage: ' + event.data);
+        var msg = JSON.parse(event.data);
+        if (!msg) {
+          console.log('empty')
+          return;
         }
-      } else if (msg.MessageId == 'Doc_ModifiedStatus') {
-        if (msg.Values) {
-          if (msg.Values.Modified == true) {
-            document.getElementById("ModifiedStatus").innerHTML = "Modified";
-          }
-          else {
-            document.getElementById("ModifiedStatus").innerHTML = "Saved";
-          }
-        }
-      } else if (msg.MessageId == 'Action_Save_Resp') {
-        if (msg.Values) {
-          if (msg.Values.success == true) {
-            document.getElementById("ModifiedStatus").innerHTML = "Saved";
-          } else {
-            document.getElementById("ModifiedStatus").innerHTML = "Error during save";
-          }
-        }
-      } else if (msg.MessageId == 'Clicked_Button') {
-        if (msg.Values) {
-          if (msg.Values.Id == 'CN_Button1') {
-            console.log("Clicked Lock Section Button");
-
-            var link = window.location.href;
-            var len = link.length;
-            var pos = len - 1;
-            while (link[pos] != '/') {
-              pos = pos - 1;
-            }
-            console.log(pos);
-            console.log(Math.min(64, len - pos - 1));
-            console.log("Link = '" + link + "'");
-            var file_id = link.substr(pos+1, Math.min(64, len - pos - 1));
-            console.log("File ID = '" + file_id + "'");
-
-            if (file_id.length < 64) {
-              file_id = "83cc46c24643d472c568ce20d49fa32c354c027a05f993d55f4da81dca840918";
-            }
-
-            // response = fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/templates/" + file_id + "/sections");
-            // sections = response.json();
-
-            fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/templates/" + file_id + "/sections", {
-              method: 'GET', // *GET, POST, PUT, DELETE, etc.
-              mode: 'cors', // no-cors, *cors, same-origin
-              credentials: 'same-origin', // include, *same-origin, omit
-              headers: {
-                'Content-Type': 'application/json'
-                // 'Content-Type': 'application/x-www-form-urlencoded',
+        if (msg.MessageId == 'App_LoadingStatus') {
+          if (msg.Values) {
+            if (msg.Values.Status == 'Document_Loaded') {
+              console.log("Adding buttons");
+              window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+      
+              var link = window.location.href;
+              var len = link.length;
+              var pos = len - 1;
+              while (link[pos] != '/') {
+                pos = pos - 1;
               }
-            })
+              console.log(pos);
+              console.log(Math.min(64, len - pos - 1));
+              console.log("Link = '" + link + "'");
+              var file_id = link.substr(pos+1, Math.min(64, len - pos - 1));
+              console.log("File ID = '" + file_id + "'");
+      
+              if (file_id.length < 64) {
+                file_id = "83cc46c24643d472c568ce20d49fa32c354c027a05f993d55f4da81dca840918";
+              }
+              
+              fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/enriched", {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+              })
               .then(response => response.json())
-                .then((out) => {
-                  var sections = out['sections'];
-                  console.log('Output: ', sections);
-               
-
-                  var section = prompt("Which section do you want to lock? (please enter section name)", "0");
-
-                  if (section == null || section == "") {
-                    txt = "Cancelled";
-                  } 
-                  else if (sections.indexOf(section) == -1) {
-                    console.log("User wants section: " + section);
-                    console.log("Have sections:");
-                    for (sec in sections) {
-                      console.log(sec);
-                    }
-                    txt = "No section with this name found";
-                  } 
-                  else {
-                    // Check if this section index is valid
-                    txt = "Okay, locking section #" + section;
-
-                    fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/lock", {
-                      method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                      mode: 'cors', // no-cors, *cors, same-origin
-                      credentials: 'same-origin', // include, *same-origin, omit
-                      headers: {
-                        'Content-Type': 'application/json'
-                        // 'Content-Type': 'application/x-www-form-urlencoded',
-                      }
-                    })
-                      .then(response => response.json())
-                        .then((out) => {
-                          var main_doc_id = out['main_doc_id']
-                          var cloned_doc_id = out['cloned_doc_id']
-
-                          var newLink = window.location.href;
-                          newLink = newLink.replace(main_doc_id, cloned_doc_id);
-                          
-                          window.location.reload();
-                          window.open(newLink);
-                        }).catch(err => console.error(err));
+              .then((out) => {
+                var isEnriched = out["enriched"];
+                console.log("Enriched - " + isEnriched);
+                if (isEnriched == true) {
+                  insertLockButton();
+                }
+              }).catch(err => console.error(err));
+      
+              fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/enriched_section", {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+              })
+              .then(response => response.json())
+              .then((out) => {
+                var isEnrichedSection = out["enriched_section"];
+                console.log("Enriched Section - " + isEnrichedSection);
+                if (isEnrichedSection == true) {
+                  insertUnlockButton();
+                }
+              }).catch(err => console.error(err));
+      
+              // insertLockButton();
+              // insertDeleteButton();
+              // insertShareButton();
+              // insertUnlockButton();
+            }
+          }
+        } else if (msg.MessageId == 'Doc_ModifiedStatus') {
+          if (msg.Values) {
+            if (msg.Values.Modified == true) {
+              document.getElementById("ModifiedStatus").innerHTML = "Modified";
+            }
+            else {
+              document.getElementById("ModifiedStatus").innerHTML = "Saved";
+            }
+          }
+        } else if (msg.MessageId == 'Action_Save_Resp') {
+          if (msg.Values) {
+            if (msg.Values.success == true) {
+              document.getElementById("ModifiedStatus").innerHTML = "Saved";
+            } else {
+              document.getElementById("ModifiedStatus").innerHTML = "Error during save";
+            }
+          }
+        } else if (msg.MessageId == 'Clicked_Button') {
+          if (msg.Values) {
+            if (msg.Values.Id == 'CN_Button_Lock') {
+              console.log("Clicked Lock Section Button");
+      
+              save();
+      
+              var link = window.location.href;
+              var len = link.length;
+              var pos = len - 1;
+              while (link[pos] != '/') {
+                pos = pos - 1;
+              }
+              console.log(pos);
+              console.log(Math.min(64, len - pos - 1));
+              console.log("Link = '" + link + "'");
+              var file_id = link.substr(pos+1, Math.min(64, len - pos - 1));
+              console.log("File ID = '" + file_id + "'");
+      
+              if (file_id.length < 64) {
+                file_id = "83cc46c24643d472c568ce20d49fa32c354c027a05f993d55f4da81dca840918";
+              }
+      
+              // response = fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/templates/" + file_id + "/sections");
+              // sections = response.json();
+      
+              fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/templates/" + file_id + "/sections", {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+              })
+              .then(response => response.json())
+              .then((out) => {
+                var sections = out['sections'];
+                console.log('Sections: ', sections);
+              
+                var section = prompt("Which section do you want to lock? (please enter section name)", "");
+  
+                if (section == null || section == "") {
+                  window.alert("Cancelled");
+                } 
+                else if (sections.indexOf(section) == -1) {
+                  console.log("User wants section: " + section);
+                  console.log("Have sections:");
+                  for (sec in sections) {
+                    console.log(sections[sec]);
                   }
+                  window.alert("No section with this name found");
+                } 
+                else {
+                  // Check if this section index is valid
+                  fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/locked", {
+                    method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                      'Content-Type': 'application/json'
+                      // 'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                  })
+                  .then(response => response.json())
+                  .then((out) => {
+                    var locked_sections = out["locked_sections"];
+                    console.log("Locked sections: ");
+                    for (sec in locked_sections) {
+                      console.log(locked_sections[sec]);
+                    }
+                    if (locked_sections.indexOf(section) == -1) {
+                      txt = "Okay, locking section '" + section + "'";
+      
+                      fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/lock", {
+                        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                          'Content-Type': 'application/json'
+                          // 'Content-Type': 'application/x-www-form-urlencoded',
+                        }
+                      })
+                      .then(response => response.json())
+                      .then((out) => {
+                        var main_doc_id = out['main_doc_id']
+                        var cloned_doc_id = out['cloned_doc_id']
 
-                  window.alert(txt) 
-                }).catch(err => console.error(err));
+                        var newLink = window.location.href;
+                        newLink = newLink.replace(main_doc_id, cloned_doc_id);
+                        
+                        window.location.reload();
+                        window.open(newLink);
+                      }).catch(err => console.error(err));
+                    }
+                    else {
+                      window.alert("Sorry, this section is already locked!");
+                    }
+                  }).catch(err => console.error(err));
+                }
+              }).catch(err => console.error(err));
+            }
+            else if (msg.Values.Id == 'CN_Button_Unlock') {
+              console.log("Clicked Unlock Section Button");
+      
+              save();
+      
+              var link = window.location.href;
+              var len = link.length;
+              var pos = len - 1;
+              while (link[pos] != '/') {
+                pos = pos - 1;
+              }
+              console.log(pos);
+              console.log(Math.min(64, len - pos - 1));
+              console.log("Link = '" + link + "'");
+              var file_id = link.substr(pos+1, Math.min(64, len - pos - 1));
+              console.log("File ID = '" + file_id + "'");
+      
+              if (file_id.length < 64) {
+                file_id = "83cc46c24643d472c568ce20d49fa32c354c027a05f993d55f4da81dca840918";
+              }
+      
+              fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/editable", {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+              })
+              .then(response => response.json())
+              .then((out) => {
+                var section = out["editable_section"];
+                console.log("Editable Section in this file - " + section);
+
+                if (window.confirm("Are you sure you want to unlock section '" + section + "' in the main file?")) {
+                  fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/unlock", {
+                    method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                      'Content-Type': 'application/json'
+                      // 'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                  })
+                  .then(response => response.json())
+                  .then((out) => {
+                    var main_doc_id = out['main_doc_id']
+        
+                    var newLink = window.location.href;
+                    newLink = newLink.replace(file_id, main_doc_id);
+                    window.top.close();
+                    window.open(newLink);
+                  }).catch(err => console.error(err));
+                }
+              }).catch(err => console.error(err));
+            }
           }
         }
         else {
           console.log("Unexpected error.");
         }
       }
-    }
-
-    // 'main' code of this <script> block, run when page is being
-    // rendered. Install the message listener.
-    window.addEventListener("message", receiveMessage, false);
-
-  </script>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body>
-  <div id="usage" class="alert" style="display:none">
-    <h2>Usage</h2>
-    <p>
-      Load this page via https or http, depending on whether SSL is enabled or not, from the Online server
-      directly.</br>
-      The document to load must be given as a query parameter called file_path. The document can be any accessible URL,
-      including on disk, via file://.
-    </p>
-
-    <h4>Example</h4>
-    <p>
-      https://localhost:9980/loleaflet/dist/framed.doc.html?file_path=file:///path/to/document/hello-world.odt
-    </p>
-  </div>
-
-  <!--<h3>PostMessage test harness</h3>
-
-  <h4>Run python InsertText.py script</h4>
-  <form id="insert-text-form">
-    Click <button
-      onclick="insertText(document.forms['insert-text-form'].elements['source'].value); return false;">here</button> to
-    insert the following text into the document:
-    <textarea name="source" value="" rows="5" cols="50"></textarea>
-  </form>
-
-  <h4>Run Capitalize.py script</h4>
-  <form id="insert-text-form">
-    Click <button onclick="capitalize(); return false;">here</button> to capitalize selected text in the
-    document.</br></br>
-  </form>
-
-  <h4>Various other messages to post</h4>
-  <form>
-    <button onclick="save(); return false;">Save</button>
-    <button onclick="closeDocument(); return false;">Close</button></br></br>
-    <button onclick="hide_commands('save'); return false;">Hide Save Commands</button>
-    <button onclick="show_commands('save'); return false;">Show Save Commands</button></br>
-    <button onclick="hide_commands('print'); return false;">Hide Print Commands</button>
-    <button onclick="show_commands('print'); return false;">Show Print Commands</button></br></br>
-    <button onclick="disable_default_uiaction('UI_Save', true); return false;">Disable default save action</button></br>
-    <button onclick="disable_default_uiaction('UI_Save', false); return false;">Enable default save
-      action</button></br></br>
-  </form>
-
-  <h3>Modified Status: <span id="ModifiedStatus">Saved</span></h3>
-
-  <h3>UI modification</h3>
-  <form id="menubar-toggle">
-    <button onclick="ShowMenubar(false); return false;">Hide Menubar</button>
-    <button onclick="ShowMenubar(true); return false;">Show Menubar</button>
-  </form>
-
-  <br />
-  <form id="insert-button">
-    Click <button onclick="insertLockButton(); return false;">here</button> to insert lock button
-  </form>
-
-  <br />
-  <form id="hide-button">
-    Click <button onclick="hideButton(); return false;">here</button> to hide lock button
-  </form>
-
-  <br />
-  <form id="show-button">
-    Click <button onclick="showButton(); return false;">here</button> to show lock button
-  </form>
-
-  <h3>Document frame</h3>
-  <h4>If the frame fails to load click <a id="link">here and accept security bits</a></h4>
-  <h4>If the frame still fails to load ensure you have <code>localhost:*</code> included in your
-    <code>net.frame_ancestors</code> in loolwsd.xml</h4>-->
-  <iframe id="frame" style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">Sorry, your browser doesn't support iframes.</iframe>
-
-  <script>
-    if (document.location.protocol == 'file:' || window.location.search == '') {
-      document.getElementById("usage").style.display = "block";
-      alert('Incorrect usage, please follow the instructions at the top of this page.');
-    }
-
-    var query = '?';
-    if (window.location.search !== '')
-      query = window.location.search + '&';
-    query += 'NotWOPIButIframe=true';
-
-    var path = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'loleaflet.html';
-    var uriBase = window.location.protocol + '//' + window.location.host + path + query;
-    var iframe = document.getElementById("frame");
-    iframe.src = uriBase;
-    // link.href = uriBase;
-  </script>
-</body>
-
+      
+      // 'main' code of this <script> block, run when page is being
+      // rendered. Install the message listener.
+      window.addEventListener("message", receiveMessage, false);
+      
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div id="usage" class="alert" style="display:none">
+      <h2>Usage</h2>
+      <p>
+        Load this page via https or http, depending on whether SSL is enabled or not, from the Online server
+        directly.</br>
+        The document to load must be given as a query parameter called file_path. The document can be any accessible URL,
+        including on disk, via file://.
+      </p>
+      <h4>Example</h4>
+      <p>
+        https://localhost:9980/loleaflet/dist/framed.doc.html?file_path=file:///path/to/document/hello-world.odt
+      </p>
+    </div>
+    <!--<h3>PostMessage test harness</h3>
+      <h4>Run python InsertText.py script</h4>
+      <form id="insert-text-form">
+        Click <button
+          onclick="insertText(document.forms['insert-text-form'].elements['source'].value); return false;">here</button> to
+        insert the following text into the document:
+        <textarea name="source" value="" rows="5" cols="50"></textarea>
+      </form>
+      
+      <h4>Run Capitalize.py script</h4>
+      <form id="insert-text-form">
+        Click <button onclick="capitalize(); return false;">here</button> to capitalize selected text in the
+        document.</br></br>
+      </form>
+      
+      <h4>Various other messages to post</h4>
+      <form>
+        <button onclick="save(); return false;">Save</button>
+        <button onclick="closeDocument(); return false;">Close</button></br></br>
+        <button onclick="hide_commands('save'); return false;">Hide Save Commands</button>
+        <button onclick="show_commands('save'); return false;">Show Save Commands</button></br>
+        <button onclick="hide_commands('print'); return false;">Hide Print Commands</button>
+        <button onclick="show_commands('print'); return false;">Show Print Commands</button></br></br>
+        <button onclick="disable_default_uiaction('UI_Save', true); return false;">Disable default save action</button></br>
+        <button onclick="disable_default_uiaction('UI_Save', false); return false;">Enable default save
+          action</button></br></br>
+      </form>
+      
+      <h3>Modified Status: <span id="ModifiedStatus">Saved</span></h3>
+      
+      <h3>UI modification</h3>
+      <form id="menubar-toggle">
+        <button onclick="ShowMenubar(false); return false;">Hide Menubar</button>
+        <button onclick="ShowMenubar(true); return false;">Show Menubar</button>
+      </form>
+      
+      <br />
+      <form id="insert-button">
+        Click <button onclick="insertLockButton(); return false;">here</button> to insert lock button
+      </form>
+      
+      <br />
+      <form id="hide-button">
+        Click <button onclick="hideButton(); return false;">here</button> to hide lock button
+      </form>
+      
+      <br />
+      <form id="show-button">
+        Click <button onclick="showButton(); return false;">here</button> to show lock button
+      </form>
+      
+      <h3>Document frame</h3>
+      <h4>If the frame fails to load click <a id="link">here and accept security bits</a></h4>
+      <h4>If the frame still fails to load ensure you have <code>localhost:*</code> included in your
+        <code>net.frame_ancestors</code> in loolwsd.xml</h4>-->
+    <iframe id="frame" style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">Sorry, your browser doesn't support iframes.</iframe>
+    <script>
+      if (document.location.protocol == 'file:' || window.location.search == '') {
+        document.getElementById("usage").style.display = "block";
+        alert('Incorrect usage, please follow the instructions at the top of this page.');
+      }
+      
+      var query = '?';
+      if (window.location.search !== '')
+        query = window.location.search + '&';
+      query += 'NotWOPIButIframe=true';
+      
+      var path = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'loleaflet.html';
+      var uriBase = window.location.protocol + '//' + window.location.host + path + query;
+      var iframe = document.getElementById("frame");
+      iframe.src = uriBase;
+      // link.href = uriBase;
+    </script>
+  </body>
 </html>

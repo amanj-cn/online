@@ -33,6 +33,7 @@ L.Control.Menubar = L.Control.extend({
 				{name: _('Close document'), id: 'closedocument', type: 'action'}
 			]},
 			{name: _UNO('.uno:EditMenu', 'text'), id: 'editmenu', type: 'menu', menu: [
+				{type: 'separator'},
 				{uno: '.uno:Undo'},
 				{uno: '.uno:Redo'},
 				{name: _('Repair'), id: 'repair',  type: 'action'},

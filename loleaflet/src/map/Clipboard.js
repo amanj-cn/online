@@ -875,7 +875,7 @@ L.Clipboard = L.Class.extend({
 	},
 
 	_substProductName: function (msg) {
-		var productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'Collabora Online Development Edition';
+		var productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'CN DevDocs';
 		return msg.replace('%productName', productName);
 	},
 
