@@ -29,145 +29,167 @@
 -->
 
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Online Editor</title>
 
-    <script>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>CN DevDocs</title>
 
-      // These functions named call* are invoked when submitting the
-      // forms defined in the body of this web page. They show how to
-      // post a message to the iframe where Online is running, that
-      // will cause a Python script in the underlying LibreOffice
-      // instance to be invoked.
+  <script>
 
-      function callSetCellColor() {
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'Host_PostmessageReady'}), '*');
-        var x = document.forms[0].elements['x'].value;
-        var y = document.forms[0].elements['y'].value;
-        var color = document.forms[0].elements['color'].value;
-        console.log('x=' + x + ' y=' + y + ' color=' + color);
-        color = parseInt('0x' + color.substring(1));
-        console.log('x=' + x + ' y=' + y + ' color=' + color);
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'CallPythonScript',
-                                                     'SendTime': Date.now(),
-                                                     'ScriptFile': 'SetCellColor.py',
-                                                     'Function': 'SetCellColor',
-                                                     'Values': {'x': {'type': 'long', 'value': x},
-                                                                'y': {'type': 'long', 'value': y},
-                                                                'color': {'type': 'long', 'value': color}
-                                                                }
-                                                     }),
-                                     '*');
-      }
+    // These functions named call* are invoked when submitting the
+    // forms defined in the body of this web page. They show how to
+    // post a message to the iframe where Online is running, that
+    // will cause a Python script in the underlying LibreOffice
+    // instance to be invoked.
 
-      function callGetNamedRanges() {
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'Host_PostmessageReady'}), '*');
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'CallPythonScript',
-                                                     'SendTime': Date.now(),
-                                                     'ScriptFile': 'NamedRanges.py',
-                                                     'Function': 'GetNamedRanges',
-                                                     'Values': null
-                                                     }),
-                                     '*');
-      }
+    function callSetCellColor() {
+      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+      var x = document.forms[0].elements['x'].value;
+      var y = document.forms[0].elements['y'].value;
+      var color = document.forms[0].elements['color'].value;
+      console.log('x=' + x + ' y=' + y + ' color=' + color);
+      color = parseInt('0x' + color.substring(1));
+      console.log('x=' + x + ' y=' + y + ' color=' + color);
+      window.frames[0].postMessage(JSON.stringify({
+        'MessageId': 'CallPythonScript',
+        'SendTime': Date.now(),
+        'ScriptFile': 'SetCellColor.py',
+        'Function': 'SetCellColor',
+        'Values': {
+          'x': { 'type': 'long', 'value': x },
+          'y': { 'type': 'long', 'value': y },
+          'color': { 'type': 'long', 'value': color }
+        }
+      }),
+        '*');
+    }
 
-      function callAddNamedRange() {
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'Host_PostmessageReady'}), '*');
-        // Our form below takes input in A1 format, the Python script wants zero-based indexes and width and height
-        var abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        var name = document.forms['add-named-range-form'].elements['name'].value;
-        var x0 = document.forms['add-named-range-form'].elements['x0'].value;
-        var x1 = document.forms['add-named-range-form'].elements['x1'].value;
-        var y0 = parseInt(document.forms['add-named-range-form'].elements['y0'].value);
-        var y1 = parseInt(document.forms['add-named-range-form'].elements['y1'].value);
-        console.log('x0=' + x0 + ', x1=' + x1)
-        x0 = abc.indexOf(x0);
-        x1 = abc.indexOf(x1);
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'CallPythonScript',
-                                                     'SendTime': Date.now(),
-                                                     'ScriptFile': 'NamedRanges.py',
-                                                     'Function': 'DefineNamedRange',
-                                                     'Values': {'sheet': {'type': 'string', 'value': 'Sheet1'},
-								'x0': {'type': 'long', 'value': x0},
-								'y0': {'type': 'long', 'value': y0-1},
-								'width': {'type': 'long', 'value': x1-x0+1},
-								'height': {'type': 'long', 'value': y1-y0+1},
-								'name': {'type': 'string', 'value': name}
-                                                               }
-                                                     }),
-                                     '*');
-      }
+    function callGetNamedRanges() {
+      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+      window.frames[0].postMessage(JSON.stringify({
+        'MessageId': 'CallPythonScript',
+        'SendTime': Date.now(),
+        'ScriptFile': 'NamedRanges.py',
+        'Function': 'GetNamedRanges',
+        'Values': null
+      }),
+        '*');
+    }
 
-      function callDeleteNamedRange() {
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'Host_PostmessageReady'}), '*');
-        var name = document.forms['delete-named-range-form'].elements['name'].value;
-        window.frames[0].postMessage(JSON.stringify({'MessageId': 'CallPythonScript',
-                                                     'SendTime': Date.now(),
-                                                     'ScriptFile': 'NamedRanges.py',
-                                                     'Function': 'DeleteNamedRange',
-                                                     'Values': {'name': {'type': 'string', 'value': name}
-                                                               }
-                                                     }),
-                                     '*');
-      }
+    function callAddNamedRange() {
+      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+      // Our form below takes input in A1 format, the Python script wants zero-based indexes and width and height
+      var abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      var name = document.forms['add-named-range-form'].elements['name'].value;
+      var x0 = document.forms['add-named-range-form'].elements['x0'].value;
+      var x1 = document.forms['add-named-range-form'].elements['x1'].value;
+      var y0 = parseInt(document.forms['add-named-range-form'].elements['y0'].value);
+      var y1 = parseInt(document.forms['add-named-range-form'].elements['y1'].value);
+      console.log('x0=' + x0 + ', x1=' + x1)
+      x0 = abc.indexOf(x0);
+      x1 = abc.indexOf(x1);
+      window.frames[0].postMessage(JSON.stringify({
+        'MessageId': 'CallPythonScript',
+        'SendTime': Date.now(),
+        'ScriptFile': 'NamedRanges.py',
+        'Function': 'DefineNamedRange',
+        'Values': {
+          'sheet': { 'type': 'string', 'value': 'Sheet1' },
+          'x0': { 'type': 'long', 'value': x0 },
+          'y0': { 'type': 'long', 'value': y0 - 1 },
+          'width': { 'type': 'long', 'value': x1 - x0 + 1 },
+          'height': { 'type': 'long', 'value': y1 - y0 + 1 },
+          'name': { 'type': 'string', 'value': name }
+        }
+      }),
+        '*');
+    }
 
-      // This function is invoked when the iframe posts a message back.
+    function callDeleteNamedRange() {
+      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+      var name = document.forms['delete-named-range-form'].elements['name'].value;
+      window.frames[0].postMessage(JSON.stringify({
+        'MessageId': 'CallPythonScript',
+        'SendTime': Date.now(),
+        'ScriptFile': 'NamedRanges.py',
+        'Function': 'DeleteNamedRange',
+        'Values': {
+          'name': { 'type': 'string', 'value': name }
+        }
+      }),
+        '*');
+    }
 
-      function receiveMessage(event) {
-        var msg = JSON.parse(event.data);
-        console.log('==== framed.html receiveMessage: ' + event.data);
-        console.log('                                 ' + msg);
+    function insertButton() {
+      window.frames[0].postMessage(JSON.stringify({ 'MessageId': 'Host_PostmessageReady' }), '*');
+      window.frames[0].postMessage(JSON.stringify({
+        'MessageId': 'Insert_Button',
+        'id': 'CN_Button1',
+        'imgurl': 'http://localhost:8000/lock.png',
+        'hint': 'Lock Section',
+        'mobile': true,
+        'label': 'Lock Section',
+        'insertBefore': 'save'
+      }),
+        '*');
+    }
 
-        // We are only interested in messages that are marked as being
-        // a result from a Python script invoked by one of the call*
-        // functions above.
+    // This function is invoked when the iframe posts a message back.
 
-        if (msg.hasOwnProperty('MessageId') &&
-            msg.MessageId === 'CallPythonScript-Result' &&
-            msg.hasOwnProperty('Values') &&
-            msg.Values.hasOwnProperty('commandName') &&
-	    msg.Values.hasOwnProperty('success') &&
-	    msg.Values.success == 'true' &&
-	    msg.Values.hasOwnProperty('result') &&
-	    msg.Values.result.hasOwnProperty('value')) {
-          // We are only interested in the result of the SetCellColor and GetNamedRanges functions
-          if (msg.Values.commandName === 'vnd.sun.star.script:SetCellColor.py$SetCellColor?language=Python&location=share') {
-	    document.forms['cell-colour-form'].elements['result'].readOnly = false;
-	    document.forms['cell-colour-form'].elements['result'].value = msg.Values.result.value;
-	    document.forms['cell-colour-form'].elements['result'].readOnly = true;
-          }
-          else if (msg.Values.commandName === 'vnd.sun.star.script:NamedRanges.py$GetNamedRanges?language=Python&location=share') {
-	    document.forms['get-named-ranges-form'].elements['result'].readOnly = false;
-            var index = 0;
-            var result = '';
-            while (msg.Values.result.value.hasOwnProperty(index.toString())) {
-              if (msg.Values.result.value[index.toString()].value.hasOwnProperty('0') &&
-                  msg.Values.result.value[index.toString()].value['0'].hasOwnProperty('value') &&
-                  msg.Values.result.value[index.toString()].value.hasOwnProperty('1') &&
-                  msg.Values.result.value[index.toString()].value['1'].hasOwnProperty('value'))
+    function receiveMessage(event) {
+      var msg = JSON.parse(event.data);
+      console.log('==== framed.html receiveMessage: ' + event.data);
+      console.log('                                 ' + msg);
+
+      // We are only interested in messages that are marked as being
+      // a result from a Python script invoked by one of the call*
+      // functions above.
+
+      if (msg.hasOwnProperty('MessageId') &&
+        msg.MessageId === 'CallPythonScript-Result' &&
+        msg.hasOwnProperty('Values') &&
+        msg.Values.hasOwnProperty('commandName') &&
+        msg.Values.hasOwnProperty('success') &&
+        msg.Values.success == 'true' &&
+        msg.Values.hasOwnProperty('result') &&
+        msg.Values.result.hasOwnProperty('value')) {
+        // We are only interested in the result of the SetCellColor and GetNamedRanges functions
+        if (msg.Values.commandName === 'vnd.sun.star.script:SetCellColor.py$SetCellColor?language=Python&location=share') {
+          document.forms['cell-colour-form'].elements['result'].readOnly = false;
+          document.forms['cell-colour-form'].elements['result'].value = msg.Values.result.value;
+          document.forms['cell-colour-form'].elements['result'].readOnly = true;
+        }
+        else if (msg.Values.commandName === 'vnd.sun.star.script:NamedRanges.py$GetNamedRanges?language=Python&location=share') {
+          document.forms['get-named-ranges-form'].elements['result'].readOnly = false;
+          var index = 0;
+          var result = '';
+          while (msg.Values.result.value.hasOwnProperty(index.toString())) {
+            if (msg.Values.result.value[index.toString()].value.hasOwnProperty('0') &&
+              msg.Values.result.value[index.toString()].value['0'].hasOwnProperty('value') &&
+              msg.Values.result.value[index.toString()].value.hasOwnProperty('1') &&
+              msg.Values.result.value[index.toString()].value['1'].hasOwnProperty('value'))
               result += msg.Values.result.value[index.toString()].value[0].value + ": " +
-                        msg.Values.result.value[index.toString()].value[1].value + "\n";
-              index++;
-            }
-	    document.forms['get-named-ranges-form'].elements['result'].value = result;
-	    document.forms['get-named-ranges-form'].elements['result'].readOnly = true;
+                msg.Values.result.value[index.toString()].value[1].value + "\n";
+            index++;
           }
+          document.forms['get-named-ranges-form'].elements['result'].value = result;
+          document.forms['get-named-ranges-form'].elements['result'].readOnly = true;
         }
       }
+    }
 
-      // 'main' code of this <script> block, run when page is being
-      // rendered. Install the message listener.
-      window.addEventListener("message", receiveMessage, false);
+    // 'main' code of this <script> block, run when page is being
+    // rendered. Install the message listener.
+    window.addEventListener("message", receiveMessage, false);
 
-    </script>
+  </script>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
-  <body style="user-select: none;">
-    <h3>Calc functions</h3>
+<body style="user-select: none;">
+  <h3>Calc functions</h3>
     <p>
       <form id="cell-colour-form">
 	Cell: (<input type="number" name="x" min="0" max="20" value="0">, <input type="number" name="y" min="0" max="20" value="0">),
@@ -197,15 +219,21 @@
     <h3>Document frame</h3>
 
     <h4>If the frame fails to load click <a id="link">here and accept security bits</a></h4>
-    <iframe id="frame" height="1000" width="1000"></iframe>
 
-    <!-- 127.0.0.2 allows us to test CSS issues -->
-    <script>
-      var uriBase = document.location.protocol + "//127.0.0.2:9980/loleaflet/42/loleaflet.html" + window.location.search;
-      var iframe = document.getElementById("frame");
-      iframe.src = uriBase + "&NotWOPIButIframe=true";
-      var msg = document.getElementById("link");
-      link.href = uriBase;
-    </script>
-  </body>
+  <form id="insert-button">
+    Click <button onclick="insertButton(); return false;">here</button> to insert a button
+  </form>
+
+  <iframe id="frame" height="1000" width="1000"></iframe>
+
+  <!-- 127.0.0.2 allows us to test CSS issues -->
+  <script>
+    var uriBase = document.location.protocol + "//127.0.0.2:9980/loleaflet/42/loleaflet.html" + window.location.search;
+    var iframe = document.getElementById("frame");
+    iframe.src = uriBase + "&NotWOPIButIframe=true";
+    var msg = document.getElementById("link");
+    link.href = uriBase;
+  </script>
+</body>
+
 </html>
