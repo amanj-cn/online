@@ -190,51 +190,6 @@
         }),
           '*');
       }
-
-      function lockSection(file_id, section) {
-        console.log("Lock Section function call - " + file_id + ", " + section);
-        fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/lock", {
-          method: 'GET', // *GET, POST, PUT, DELETE, etc.
-          mode: 'cors', // no-cors, *cors, same-origin
-          credentials: 'same-origin', // include, *same-origin, omit
-          headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        })
-        .then(response => response.json())
-        .then((out) => {
-          var main_doc_id = out['main_doc_id']
-          var cloned_doc_id = out['cloned_doc_id']
-
-          var newLink = window.location.href;
-          newLink = newLink.replace(main_doc_id, cloned_doc_id);
-          
-          window.location.reload();
-          window.open(newLink);
-        }).catch(err => console.error(err));
-      }
-
-      function unlockSection(file_id, section) {
-        console.log("Unock Section function call - " + file_id + ", " + section);
-        fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/unlock", {
-          method: 'GET', // *GET, POST, PUT, DELETE, etc.
-          mode: 'cors', // no-cors, *cors, same-origin
-          credentials: 'same-origin', // include, *same-origin, omit
-          headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        })
-        .then(response => response.json())
-        .then((out) => {
-          var main_doc_id = out['main_doc_id'];
-          var newLink = window.location.href;
-          newLink = newLink.replace(file_id, main_doc_id);
-          window.top.close();
-          window.open(newLink);
-        }).catch(err => console.error(err));
-      }
       
       // This function is invoked when the iframe posts a message back.
       
@@ -369,116 +324,66 @@
                 var sections = out['sections'];
                 console.log('Sections: ', sections);
 
-                fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/locked", {
-                  method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                  mode: 'cors', // no-cors, *cors, same-origin
-                  credentials: 'same-origin', // include, *same-origin, omit
-                  headers: {
-                    'Content-Type': 'application/json'
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                var section = prompt("Which section do you want to lock? (please enter section name)", "");
+
+                if (section == null || section == "") {
+                  window.alert("Cancelled");
+                } 
+                else if (sections.indexOf(section) == -1) {
+                  console.log("User wants section: " + section);
+                  console.log("Have sections:");
+                  for (sec in sections) {
+                    console.log(sections[sec]);
                   }
-                })
-                .then(response => response.json())
-                .then((out) => {
-                  var locked_sections = out["locked_sections"];
-                  console.log("Locked sections: ");
+                  window.alert("No section with this name found");
+                } 
+                else {
+                  // Check if this section index is valid
+                  fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/locked", {
+                    method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                      'Content-Type': 'application/json'
+                      // 'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                  })
+                  .then(response => response.json())
+                  .then((out) => {
+                    var locked_sections = out["locked_sections"];
+                    console.log("Locked sections: ");
+                    for (sec in locked_sections) {
+                      console.log(locked_sections[sec]);
+                    }
+                    if (locked_sections.indexOf(section) == -1) {
+                      txt = "Okay, locking section '" + section + "'";
+      
+                      fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/lock", {
+                        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                          'Content-Type': 'application/json'
+                          // 'Content-Type': 'application/x-www-form-urlencoded',
+                        }
+                      })
+                      .then(response => response.json())
+                      .then((out) => {
+                        var main_doc_id = out['main_doc_id']
+                        var cloned_doc_id = out['cloned_doc_id']
 
-                  for (section in locked_sections) {
-                    console.log(locked_sections[section]);
-                  }
-                  
-                  lockModalHTML = "<table class='col-12 table table-hover text-center p-0 m-0'><thead></thead><tbody>";
-
-                  for (section in sections) {
-                    // sectionHTML = "<div class='row' onclick='lockSection('" + file_id + "', '" + sections[section] + "')'><div class='col-12 text-center'><a href='#'>" + sections[section] + "</a></div></div>";
-                    // sectionLockedHTML = "<div class='row'><div class='col-12 text-center'>" + sections[section] + " (locked)</div></div>";
-
-                    sectionHTML = "<tr style='transform: rotate(0);'><td scope='row'><a href='#' class='stretched-link' onclick='lockSection(\"" + file_id + "\", \"" + sections[section] + "\")'>" + sections[section] + "</a></td></tr>";
-                    sectionLockedHTML = "<tr style='transform: rotate(0);'><td scope='row'>" + sections[section] + " (locked)</td></tr>";
-
-                    if (locked_sections.indexOf(sections[section]) == -1) {
-                      lockModalHTML += sectionHTML;
+                        var newLink = window.location.href;
+                        newLink = newLink.replace(main_doc_id, cloned_doc_id);
+                        
+                        window.location.reload();
+                        window.open(newLink);
+                      }).catch(err => console.error(err));
                     }
                     else {
-                      lockModalHTML += sectionLockedHTML;
+                      window.alert("Sorry, this section is already locked!");
                     }
-                  }
-
-                  lockModalHTML += "</tbody></table>";
-
-                  document.getElementById("lockSectionModalBody").innerHTML = lockModalHTML;
-
-                  $("#lockSectionModal").modal();
-                }).catch(err => console.error(err));
-
-                // var section = prompt("Which section do you want to lock? (please enter section name)", "");
-
-                // $(document).ready(function(){
-                //   $("#myBtn").click(function(){
-                //     $("#lockSectionsModal").modal();
-                //   });
-                // });
-
-                // section = null;
-
-                // if (section == null || section == "") {
-                //   window.alert("Cancelled");
-                // } 
-                // else if (sections.indexOf(section) == -1) {
-                //   console.log("User wants section: " + section);
-                //   console.log("Have sections:");
-                //   for (sec in sections) {
-                //     console.log(sections[sec]);
-                //   }
-                //   window.alert("No section with this name found");
-                // } 
-                // else {
-                //   // Check if this section index is valid
-                //   fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/locked", {
-                //     method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                //     mode: 'cors', // no-cors, *cors, same-origin
-                //     credentials: 'same-origin', // include, *same-origin, omit
-                //     headers: {
-                //       'Content-Type': 'application/json'
-                //       // 'Content-Type': 'application/x-www-form-urlencoded',
-                //     }
-                //   })
-                //   .then(response => response.json())
-                //   .then((out) => {
-                //     var locked_sections = out["locked_sections"];
-                //     console.log("Locked sections: ");
-                //     for (sec in locked_sections) {
-                //       console.log(locked_sections[sec]);
-                //     }
-                //     if (locked_sections.indexOf(section) == -1) {
-                //       txt = "Okay, locking section '" + section + "'";
-      
-                //       fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/lock", {
-                //         method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                //         mode: 'cors', // no-cors, *cors, same-origin
-                //         credentials: 'same-origin', // include, *same-origin, omit
-                //         headers: {
-                //           'Content-Type': 'application/json'
-                //           // 'Content-Type': 'application/x-www-form-urlencoded',
-                //         }
-                //       })
-                //       .then(response => response.json())
-                //       .then((out) => {
-                //         var main_doc_id = out['main_doc_id']
-                //         var cloned_doc_id = out['cloned_doc_id']
-
-                //         var newLink = window.location.href;
-                //         newLink = newLink.replace(main_doc_id, cloned_doc_id);
-                        
-                //         window.location.reload();
-                //         window.open(newLink);
-                //       }).catch(err => console.error(err));
-                //     }
-                //     else {
-                //       window.alert("Sorry, this section is already locked!");
-                //     }
-                //   }).catch(err => console.error(err));
-                // }
+                  }).catch(err => console.error(err));
+                }
               }).catch(err => console.error(err));
             }
             else if (msg.Values.Id == 'CN_Button_Unlock') {
@@ -516,31 +421,26 @@
                 var section = unescape(out["editable_section"]);
                 console.log("Editable Section in this file - " + section);
 
-                document.getElementById("unlockSectionModalTitle").innerHTML = "Are you sure you want to unlock section '" + section + "'?";
-                document.getElementById("unlockSectionModalButton").addEventListener("click", function(){unlockSection(file_id, section)}, false);
-
-                $("#unlockSectionModal").modal();
-
-                // if (window.confirm("Are you sure you want to unlock section '" + section + "' in the main file?")) {
-                //   fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/unlock", {
-                //     method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                //     mode: 'cors', // no-cors, *cors, same-origin
-                //     credentials: 'same-origin', // include, *same-origin, omit
-                //     headers: {
-                //       'Content-Type': 'application/json'
-                //       // 'Content-Type': 'application/x-www-form-urlencoded',
-                //     }
-                //   })
-                //   .then(response => response.json())
-                //   .then((out) => {
-                //     var main_doc_id = out['main_doc_id']
+                if (window.confirm("Are you sure you want to unlock section '" + section + "' in the main file?")) {
+                  fetch("https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/files/" + file_id + "/sections/" + section + "/unlock", {
+                    method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                      'Content-Type': 'application/json'
+                      // 'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                  })
+                  .then(response => response.json())
+                  .then((out) => {
+                    var main_doc_id = out['main_doc_id']
         
-                //     var newLink = window.location.href;
-                //     newLink = newLink.replace(file_id, main_doc_id);
-                //     window.top.close();
-                //     window.open(newLink);
-                //   }).catch(err => console.error(err));
-                // }
+                    var newLink = window.location.href;
+                    newLink = newLink.replace(file_id, main_doc_id);
+                    window.top.close();
+                    window.open(newLink);
+                  }).catch(err => console.error(err));
+                }
               }).catch(err => console.error(err));
             }
           }
@@ -604,11 +504,11 @@
         <button onclick="disable_default_uiaction('UI_Save', true); return false;">Disable default save action</button></br>
         <button onclick="disable_default_uiaction('UI_Save', false); return false;">Enable default save
           action</button></br></br>
-      </form> -->
+      </form>
       
-      <h3><span id="ModifiedStatus"></span></h3>
+      <h3>Modified Status: <span id="ModifiedStatus">Saved</span></h3>
       
-      <!--<h3>UI modification</h3>
+      <h3>UI modification</h3>
       <form id="menubar-toggle">
         <button onclick="ShowMenubar(false); return false;">Hide Menubar</button>
         <button onclick="ShowMenubar(true); return false;">Show Menubar</button>
@@ -667,44 +567,25 @@
     
       <!-- Modal -->
       <div class="modal fade" id="lockSectionModal" role="dialog">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog">
         
           <!-- Modal content-->
           <div class="modal-content">
             <div class="modal-header">
               <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
-              <h4 class="col-12 modal-title text-center">Which section would you like to lock?</h4>
+              <h4 class="modal-title">Which section would you like to lock?</h4>
             </div>
-            <div class="modal-body p-0 m-0" id="lockSectionModalBody">
+            <div class="modal-body" id="lockSectionModalBody">
               <!-- <p>Some text in the modal.</p> -->
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>
           
         </div>
       </div>
-
-      <!-- Modal -->
-      <div class="modal fade" id="unlockSectionModal" role="dialog">
-        <div class="modal-dialog modal-lg">
-        
-          <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-              <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
-              <h4 class="col-12 modal-title text-center" id="unlockSectionModalTitle"></h4>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" id="unlockSectionModalButton">Unlock</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-
+      
     </div>
 
 
