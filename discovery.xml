@@ -4,7 +4,7 @@
 
         <!-- Writer documents -->
         <!-- <app name="writer" favIconUrl="images/x-office-document.svg"> -->
-        <app name="writer" favIconUrl="images/dd.jpg">
+        <app name="writer" favIconUrl="images/logo.png">
             <action name="view" default="true" ext="sxw"/>
             <action name="edit" default="true" ext="odt"/>
             <action name="edit" default="true" ext="fodt"/>
@@ -50,7 +50,7 @@
 
         <!-- Calc documents -->
         <!-- <app name="calc" favIconUrl="images/x-office-spreadsheet.svg"> -->
-        <app name="writer" favIconUrl="images/dd.jpg">
+        <app name="writer" favIconUrl="images/logo.png">
             <action name="view" default="true" ext="sxc"/>
             <action name="edit" default="true" ext="ods"/>
             <action name="edit" default="true" ext="fods"/>
@@ -78,7 +78,7 @@
 
         <!-- Impress documents -->
         <!-- <app name="impress" favIconUrl="images/x-office-presentation.svg"> -->
-        <app name="writer" favIconUrl="images/dd.jpg">
+        <app name="writer" favIconUrl="images/logo.png">
             <action name="view" default="true" ext="sxi"/>
             <action name="edit" default="true" ext="odp"/>
             <action name="edit" default="true" ext="fodp"/>

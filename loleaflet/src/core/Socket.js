@@ -64,7 +64,7 @@ L.Socket = L.Class.extend({
 				if (isIE11)
 					msgHint = _('IE11 has reached its maximum number of connections. Please see this document to increase this limit if needed: https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/general-info/ee330736(v=vs.85)#websocket-maximum-server-connections');
 
-				this._map.fire('error', {msg: _('Oops, there is a problem connecting to %productName: ').replace('%productName', (typeof brandProductName !== 'undefined' ? brandProductName : 'CN DevDocs')) + e + msgHint, cmd: 'socket', kind: 'failed', id: 3});
+				this._map.fire('error', {msg: _('Oops, there is a problem connecting to %productName: ').replace('%productName', (typeof brandProductName !== 'undefined' ? brandProductName : 'DevFolder')) + e + msgHint, cmd: 'socket', kind: 'failed', id: 3});
 				return;
 			}
 		}
@@ -752,7 +752,7 @@ L.Socket = L.Class.extend({
 				textMsg = textMsg.replace(/{docs}/g, command.params[0]);
 				textMsg = textMsg.replace(/{connections}/g, command.params[1]);
 				textMsg = textMsg.replace(/{productname}/g, (typeof brandProductName !== 'undefined' ?
-					brandProductName : 'CN DevDocs'));
+					brandProductName : 'DevFolder'));
 				var brandFAQURL = (typeof brandProductFAQURL !== 'undefined') ?
 					brandProductFAQURL : 'https://devdfactory.com';
 				this._map.fire('infobar',

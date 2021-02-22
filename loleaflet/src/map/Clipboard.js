@@ -875,7 +875,7 @@ L.Clipboard = L.Class.extend({
 	},
 
 	_substProductName: function (msg) {
-		var productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'CN DevDocs';
+		var productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'DevFolder';
 		return msg.replace('%productName', productName);
 	},
 

@@ -363,7 +363,7 @@ L.Map.include({
 			if (window.ThisIsAMobileApp) {
 				productName = window.MobileAppName;
 			} else {
-				productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'CN DevDocs';
+				productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'DevFolder';
 			}
 			vex.open({
 				unsafeContent: data,
@@ -640,7 +640,7 @@ L.Map.include({
 		if (window.ThisIsAMobileApp) {
 			productName = window.MobileAppName;
 		} else {
-			productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'CN DevDocs';
+			productName = (typeof brandProductName !== 'undefined') ? brandProductName : 'DevFolder';
 		}
 		var productURL = (typeof brandProductURL !== 'undefined') ? brandProductURL : 'https://collaboraonline.github.io/';
 		content.find('#product-name').text(productName).addClass('product-' + productName.split(/[ ()]+/).join('-').toLowerCase());
