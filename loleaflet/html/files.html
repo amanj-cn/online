@@ -430,7 +430,7 @@
                     </svg>`;
 
                     var sectionHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + unlocked_icon + " Unlocked</td><td style='transform: rotate(0);'><a href='#' class='stretched-link' onclick='lockSection(\""
-                      + file_id + "\", \"" + sections[section] + "\")'>" + lock_icon + " Lock</a></td></tr>";
+                      + file_id + "\", \"" + sections[section] + "\", \"" + auth_code + "\")'>" + lock_icon + " Lock</a></td></tr>";
                     var sectionLockedHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + locked_icon + " Locked by you</td><td style='transform: rotate(0);'><a class='stretched-link' href=" + section_file_url + ">" + open_icon + " Open</a></td></tr>";
 
                     if (locked_sections.indexOf(sections[section]) == -1) {
@@ -492,7 +492,7 @@
                 console.log("Editable Section in this file - " + section);
 
                 document.getElementById("unlockSectionModalTitle").innerHTML = "Are you sure you want to unlock section '<strong>" + section + "</strong>'?";
-                document.getElementById("unlockSectionModalButton").addEventListener("click", function(){unlockSection(file_id, section)}, false);
+                document.getElementById("unlockSectionModalButton").addEventListener("click", function(){unlockSection(file_id, section, auth_code)}, false);
 
                 $("#unlockSectionModal").modal();
 
