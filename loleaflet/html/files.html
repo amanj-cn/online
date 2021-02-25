@@ -94,6 +94,22 @@
           'Values': { 'id': id, }
         });
       }
+
+      function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
       
       function disable_default_uiaction(action, disable) {
         post({
@@ -190,14 +206,15 @@
           '*');
       }
 
-      function lockSection(file_id, section) {
+      function lockSection(file_id, section, auth_code) {
         console.log("Lock Section function call - " + file_id + ", " + section);
         fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/" + section + "/lock", {
           method: 'GET', // *GET, POST, PUT, DELETE, etc.
           mode: 'cors', // no-cors, *cors, same-origin
           credentials: 'same-origin', // include, *same-origin, omit
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + auth_code
             // 'Content-Type': 'application/x-www-form-urlencoded',
           }
         })
@@ -214,14 +231,15 @@
         }).catch(err => console.error(err));
       }
 
-      function unlockSection(file_id, section) {
+      function unlockSection(file_id, section, auth_code) {
         console.log("Unock Section function call - " + file_id + ", " + section);
         fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/" + section + "/unlock", {
           method: 'GET', // *GET, POST, PUT, DELETE, etc.
           mode: 'cors', // no-cors, *cors, same-origin
           credentials: 'same-origin', // include, *same-origin, omit
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + auth_code
             // 'Content-Type': 'application/x-www-form-urlencoded',
           }
         })
@@ -255,6 +273,8 @@
               var link = window.location.href;
               var len = link.length;
               var pos = len - 1;
+
+              var auth_code = getCookie("code");
               // while (link[pos] != '/') {
               //   pos = pos - 1;
               // }
@@ -275,7 +295,8 @@
                 mode: 'cors', // no-cors, *cors, same-origin
                 credentials: 'same-origin', // include, *same-origin, omit
                 headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + auth_code
                   // 'Content-Type': 'application/x-www-form-urlencoded',
                 }
               })
@@ -293,7 +314,8 @@
                 mode: 'cors', // no-cors, *cors, same-origin
                 credentials: 'same-origin', // include, *same-origin, omit
                 headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + auth_code
                   // 'Content-Type': 'application/x-www-form-urlencoded',
                 }
               })
@@ -348,13 +370,16 @@
               // }
 
               var file_id = window.location.search.substr(1);
+
+              var auth_code = getCookie("code");
       
               fetch(BACKEND_DOMAIN + "/templates/" + file_id + "/sections", {
                 method: 'GET', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
                 credentials: 'same-origin', // include, *same-origin, omit
                 headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer' + auth_code
                   // 'Content-Type': 'application/x-www-form-urlencoded',
                 }
               })
@@ -369,7 +394,8 @@
                   mode: 'cors', // no-cors, *cors, same-origin
                   credentials: 'same-origin', // include, *same-origin, omit
                   headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + auth_code
                     // 'Content-Type': 'application/x-www-form-urlencoded',
                   }
                 })
@@ -447,13 +473,15 @@
               // }
 
               var file_id = window.location.search.substr(1);
+              var auth_code = getCookie("code");
       
               fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/editable", {
                 method: 'GET', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
                 credentials: 'same-origin', // include, *same-origin, omit
                 headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + auth_code
                   // 'Content-Type': 'application/x-www-form-urlencoded',
                 }
               })
@@ -558,29 +586,13 @@
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
       }
 
-      function getCookie(cname) {
-        var name = cname + "=";
-        var decodedCookie = decodeURIComponent(document.cookie);
-        var ca = decodedCookie.split(';');
-        for(var i = 0; i <ca.length; i++) {
-          var c = ca[i];
-          while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-          }
-          if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-          }
-        }
-        return "";
-      }
-
-      var auth_code_cookie = getCookie("code");
-      if (!auth_code_cookie) {
+      var auth_code = getCookie("code");
+      if (!auth_code) {
         // window.location.href = LOGIN_URL;
       }
 
       var user_data = {
-        auth_code: auth_code_cookie
+        auth_code: auth_code
       }
       console.log(user_data);
 
@@ -589,7 +601,8 @@
         mode: 'cors', // no-cors, *cors, same-origin
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + auth_code
         },
             body: JSON.stringify(user_data),
       })
@@ -636,7 +649,7 @@
       console.log("Iframe host = " + host);
       var pathname = '/loleaflet/dist/loleaflet.html'
       var file_id = window.location.search.substr(1);
-      var access_token = getCookie("access_token");
+      var access_token = getCookie("code");
       var query = '?WOPISrc=' + WOPI_SRC + '/' + file_id + '&access_token=' + access_token + '&NotWOPIButIframe=true'
       var path = protocol + '//' + host + pathname + query
 
