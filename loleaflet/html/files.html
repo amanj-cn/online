@@ -226,8 +226,8 @@
           var newLink = window.location.href;
           newLink = newLink.replace(main_doc_id, cloned_doc_id);
           
-          window.location.reload();
           window.open(newLink);
+          window.location.reload();
         }).catch(err => console.error(err));
       }
 
