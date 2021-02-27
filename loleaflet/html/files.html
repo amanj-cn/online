@@ -457,7 +457,9 @@
                       else {
                         var sectionLink = window.location.href;
                         sectionLink.replace(file_id, section_file_id);
+                        console.log(sectionLink);
                         var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + ">" + open_icon + " Open</a></td></tr>";
+                        console.log(addLinkHTML);
                         lockModalHTML += addLinkHTML;
                       }
                     }
