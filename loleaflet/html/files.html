@@ -386,7 +386,7 @@
                 .then((out) => {
                   console.log(out);
                   var locked_sections = out["locked_sections"];
-                  var locked_section_details = out["locked_section_details"];
+                  var locked_section_details = out["locked_sections_details"];
                   var section_file_ids = out["section_file_ids"];
                   console.log("Locked sections: ");
                   for (section in locked_sections) {
@@ -432,6 +432,8 @@
                     else {
                       var details = {};
                       for (detail in locked_section_details) {
+                        console.log(locked_section_details[detail].section_name);
+                        console.log(locked_section_details[detail]["section_name"]);
                         if (locked_section_details[detail].section_name == sections[section]) {
                           details = locked_section_details[detail];
                         }
