@@ -746,7 +746,8 @@ std::string LOOLWSD::ConfigDir = LOOLWSD_CONFIGDIR "/conf.d";
 std::string LOOLWSD::LogLevel = "trace";
 std::string LOOLWSD::UserInterface = "classic";
 bool LOOLWSD::AnonymizeUserData = false;
-bool LOOLWSD::CheckLoolUser = true;
+// bool LOOLWSD::CheckLoolUser = true;
+bool LOOLWSD::CheckLoolUser = false;
 bool LOOLWSD::CleanupOnly = false; //< If we should cleanup and exit.
 bool LOOLWSD::IsProxyPrefixEnabled = false;
 #if ENABLE_SSL
