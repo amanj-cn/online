@@ -386,7 +386,7 @@
                 .then((out) => {
                   console.log(out);
                   var locked_sections = out["locked_sections"];
-                  var locked_details = out["locked_section_details"];
+                  var locked_section_details = out["locked_section_details"];
                   var section_file_ids = out["section_file_ids"];
                   console.log("Locked sections: ");
                   for (section in locked_sections) {
@@ -451,6 +451,8 @@
                         lockModalHTML += noLinkHTML;
                       }
                       else {
+                        var sectionLink = window.location.href;
+                        sectionLink.replace(file_id, section_file_id)
                         var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + ">" + open_icon + " Open</a></td></tr>";
                         lockModalHTML += addLinkHTML;
                       }
