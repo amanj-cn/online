@@ -275,18 +275,6 @@
               var pos = len - 1;
 
               var auth_code = getCookie("code");
-              // while (link[pos] != '/') {
-              //   pos = pos - 1;
-              // }
-              // console.log(pos);
-              // console.log(Math.min(64, len - pos - 1));
-              // console.log("Link = '" + link + "'");
-              // var file_id = link.substr(pos+1, Math.min(64, len - pos - 1));
-              // console.log("File ID = '" + file_id + "'");
-      
-              // if (file_id.length < 64) {
-              //   file_id = "83cc46c24643d472c568ce20d49fa32c354c027a05f993d55f4da81dca840918";
-              // }
 
               var file_id = window.location.search.substr(1);
               
@@ -356,18 +344,6 @@
               var link = window.location.href;
               var len = link.length;
               var pos = len - 1;
-              // while (link[pos] != '/') {
-              //   pos = pos - 1;
-              // }
-              // console.log(pos);
-              // console.log(Math.min(64, len - pos - 1));
-              // console.log("Link = '" + link + "'");
-              // var file_id = link.substr(pos+1, Math.min(64, len - pos - 1));
-              // console.log("File ID = '" + file_id + "'");
-      
-              // if (file_id.length < 64) {
-              //   file_id = "83cc46c24643d472c568ce20d49fa32c354c027a05f993d55f4da81dca840918";
-              // }
 
               var file_id = window.location.search.substr(1);
 
@@ -459,18 +435,6 @@
               var link = window.location.href;
               var len = link.length;
               var pos = len - 1;
-              // while (link[pos] != '/') {
-              //   pos = pos - 1;
-              // }
-              // console.log(pos);
-              // console.log(Math.min(64, len - pos - 1));
-              // console.log("Link = '" + link + "'");
-              // var file_id = link.substr(pos+1, Math.min(64, len - pos - 1));
-              // console.log("File ID = '" + file_id + "'");
-      
-              // if (file_id.length < 64) {
-              //   file_id = "83cc46c24643d472c568ce20d49fa32c354c027a05f993d55f4da81dca840918";
-              // }
 
               var file_id = window.location.search.substr(1);
               var auth_code = getCookie("code");
@@ -501,7 +465,8 @@
           }
         }
         else {
-          console.log("Unexpected error.");
+          console.log("Received PostMessage");
+          console.log(event.data);
         }
       }
       
@@ -588,7 +553,7 @@
 
       var auth_code = getCookie("code");
       if (!auth_code) {
-        // window.location.href = LOGIN_URL;
+        window.location.href = LOGIN_URL;
       }
 
       var user_data = {
@@ -609,38 +574,19 @@
       .then(function(response) {
         console.log(response.status); // Will show the status
         if (!response.ok) {
-            throw new Error("HTTP status " + response.status);
-            // window.location.href = LOGIN_URL;
+            throw new Error("User Session HTTP status " + response.status);
+            window.location.href = LOGIN_URL;
         }
         return response.json();
       })
       .then((out) => {
         console.log(out);
-        // var section = unescape(out["editable_section"]);
-        // console.log("Editable Section in this file - " + section);
       }).catch(err => console.error(err));
 
       if (document.location.protocol == 'file:' || window.location.search == '') {
         document.getElementById("usage").style.display = "block";
-        alert('Incorrect usage, please follow the instructions at the top of this page.');
+        alert('Incorrect usage, please open the file from the DevFolder console.');
       }
-      
-      // var query = '?';
-      // if (window.location.search !== '')
-      //   query = window.location.search + '&';
-      // query += 'NotWOPIButIframe=true';
-      
-      // var path = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'loleaflet.html';
-      // var uriBase = window.location.protocol + '//' + window.location.host + path + query;
-      // var iframe = document.getElementById("frame");
-      // iframe.src = uriBase;
-
-      // var protocol = window.location.protocol;
-      // var host = window.location.host;
-      // var path_prefix = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/', window.location.pathname.lastIndexOf('/')-1) + 1);
-      // var file_id = window.location.pathname.substr(window.location.pathname.lastIndexOf('/')+1);
-      // var query = '?WOPISrc=' + WOPI_SRC + "/" + file_id;
-      // var path = protocol + '//' + host + path_prefix + 'loleaflet.html' + query;
 
       var protocol = "https:"
       var host = window.location.host;
