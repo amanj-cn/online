@@ -308,7 +308,7 @@ ENABLE_DEBUG=false
 ENABLE_DEBUG_PROTOCOL=false
 LOOLWSD_LOGLEVEL="warning"
 LOOLWSD_LOG_TO_FILE="false"
-LOOLWSD_LOGFILE="/var/log/loolwsd.log"
+LOOLWSD_LOGFILE="/home/harman/code/workdocs/online/loolwsd.log"
 LOOLWSD_ANONYMIZE_USER_DATA=false
 LOLEAFLET_LOGGING="false"
 debug_msg="secure mode: product build"
@@ -319,7 +319,8 @@ if test "$enable_debug" = "yes"; then
    ENABLE_DEBUG_PROTOCOL=true
    LOOLWSD_LOGLEVEL="trace"
    LOOLWSD_LOG_TO_FILE="true"
-   LOOLWSD_LOGFILE="/tmp/loolwsd.log"
+#    LOOLWSD_LOGFILE="/tmp/loolwsd.log"
+   LOOLWSD_LOGFILE="/home/harman/code/workdocs/online/loolwsd.log"
    LOOLWSD_ANONYMIZE_USER_DATA=false
    LOLEAFLET_LOGGING="true"
    debug_msg="low security debugging mode"
@@ -1116,7 +1117,8 @@ APP_HAS_BRANDING="false"
 if test "$with_app_branding" != no -a -d "$with_app_branding"; then
     APP_BRANDING_DIR="$with_app_branding"
     APP_IC_LAUNCHER="ic_launcher_brand"
-    APP_HAS_BRANDING="true"
+    # APP_HAS_BRANDING="true"
+    APP_HAS_BRANDING="false"
 fi
 AC_SUBST(APP_BRANDING_DIR)
 AC_SUBST(APP_IC_LAUNCHER)
