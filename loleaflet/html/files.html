@@ -386,10 +386,21 @@
                 .then((out) => {
                   console.log(out);
                   var locked_sections = out["locked_sections"];
+                  var locked_details = out["locked_section_details"];
+                  var section_file_ids = out["section_file_ids"];
                   console.log("Locked sections: ");
-
                   for (section in locked_sections) {
                     console.log(locked_sections[section]);
+                  }
+
+                  console.log("Locked section details: ")
+                  for (detail in locked_section_details) {
+                    console.log(detail);
+                  }
+                  
+                  console.log("Section File IDs: ")
+                  for (id in section_file_ids) {
+                    console.log(id);
                   }
                   
                   var lockModalHTML = "<table class='col-12 table table-hover text-center p-0 m-0'><thead><th scope = 'col'>Section</th><th>Status</th><th>Action</th></thead><tbody>";
@@ -412,19 +423,41 @@
                       <path fill-rule="evenodd" d="M11 5.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793l-8.147 8.146a.5.5 0 0 0 .708.708L10 6.707V10.5a.5.5 0 0 0 1 0v-5z"/>
                     </svg>`;
 
-                    var sectionHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + unlocked_icon + " Unlocked</td><td style='transform: rotate(0);'><a href='#' class='stretched-link' onclick='lockSection(\""
-                      + file_id + "\", \"" + sections[section] + "\", \"" + auth_code + "\")'>" + lock_icon + " Lock</a></td></tr>";
-                    var sectionLockedHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + locked_icon + " Locked by you</td><td style='transform: rotate(0);'><a class='stretched-link' href=" + section_file_url + ">" + open_icon + " Open</a></td></tr>";
-
+                    
                     if (locked_sections.indexOf(sections[section]) == -1) {
+                      var sectionHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + unlocked_icon + " Unlocked</td><td style='transform: rotate(0);'><a href='#' class='stretched-link' onclick='lockSection(\""
+                      + file_id + "\", \"" + sections[section] + "\", \"" + auth_code + "\")'>" + lock_icon + " Lock</a></td></tr>";
                       lockModalHTML += sectionHTML;
                     }
                     else {
+                      var details = {};
+                      for (detail in locked_section_details) {
+                        if (detail.section_name == sections[section]) {
+                          details = detail;
+                        }
+                      }
+
+                      var sectionLockedHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + locked_icon + " Locked by " + details["user_name"] + "</td>";
                       lockModalHTML += sectionLockedHTML;
+
+                      var section_file_id = "";
+                      for (sect in section_file_ids) {
+                        if (sect.section_name == sections[section]) {
+                          section_file_id = sect.section_file_id
+                        }
+                      }
+                      if (section_file_id == "") {
+                        var noLinkHTML = "<td><strong>-</strong></td></tr>";
+                        lockModalHTML += noLinkHTML;
+                      }
+                      else {
+                        var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + ">" + open_icon + " Open</a></td></tr>";
+                        lockModalHTML += addLinkHTML;
+                      }
                     }
                   }
 
-                  lockModalHTML += "<tr style='transform: rotate(0);'><td scope='row'>- - - TEST SECTION - - -</td><td>" + locked_icon + " Locked by someone else</td><td><strong>-</strong></td></tr>"
+                  // lockModalHTML += "<tr style='transform: rotate(0);'><td scope='row'>- - - TEST SECTION - - -</td><td>" + locked_icon + " Locked by someone else</td><td><strong>-</strong></td></tr>"
 
                   lockModalHTML += "</tbody></table>";
 
