@@ -249,10 +249,13 @@
           var main_doc_id = out['main_doc_id'];
           var newLink = window.location.href;
           newLink = newLink.replace(file_id, main_doc_id);
+          console.log("Current file id = " + file_id)
+          console.log("Main doc id = " + main_doc_id)
+          console.log("New link = " + newLink)
           // var winTop = window.top;
           // window.open(newLink);
           // setTimeout(() => {  winTop.close(); }, 2000);
-          window.location.href = newLink;
+          // window.location.href = newLink;
         }).catch(err => console.error(err));
       }
       
