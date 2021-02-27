@@ -446,16 +446,16 @@
                           section_file_id = section_file_ids[sect].section_file_id
                         }
                       }
-                      console.log("---");
-                      console.log(section_file_id);
-                      console.log(file_id);
-                      console.log("---");
                       if (section_file_id == "") {
                         var noLinkHTML = "<td><strong>-</strong></td></tr>";
                         lockModalHTML += noLinkHTML;
                       }
                       else {
                         var sectionLink = window.location.href;
+                        console.log("---");
+                        console.log(file_id);
+                        console.log(section_file_id);
+                        console.log("---");
                         sectionLink.replace(file_id, section_file_id);
                         console.log(sectionLink);
                         var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + ">" + open_icon + " Open</a></td></tr>";
