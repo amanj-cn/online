@@ -432,8 +432,6 @@
                     else {
                       var details = {};
                       for (detail in locked_section_details) {
-                        console.log(locked_section_details[detail].section_name);
-                        console.log(locked_section_details[detail]["section_name"]);
                         if (locked_section_details[detail].section_name == sections[section]) {
                           details = locked_section_details[detail];
                         }
@@ -448,13 +446,17 @@
                           section_file_id = section_file_ids[sect].section_file_id
                         }
                       }
+                      console.log("---");
+                      console.log(section_file_id);
+                      console.log(file_id);
+                      console.log("---");
                       if (section_file_id == "") {
                         var noLinkHTML = "<td><strong>-</strong></td></tr>";
                         lockModalHTML += noLinkHTML;
                       }
                       else {
                         var sectionLink = window.location.href;
-                        sectionLink.replace(file_id, section_file_id)
+                        sectionLink.replace(file_id, section_file_id);
                         var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + ">" + open_icon + " Open</a></td></tr>";
                         lockModalHTML += addLinkHTML;
                       }
