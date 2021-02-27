@@ -395,12 +395,12 @@
 
                   console.log("Locked section details: ")
                   for (detail in locked_section_details) {
-                    console.log(detail);
+                    console.log(locked_section_details[detail]);
                   }
                   
                   console.log("Section File IDs: ")
                   for (id in section_file_ids) {
-                    console.log(id);
+                    console.log(section_file_ids[id]);
                   }
                   
                   var lockModalHTML = "<table class='col-12 table table-hover text-center p-0 m-0'><thead><th scope = 'col'>Section</th><th>Status</th><th>Action</th></thead><tbody>";
@@ -432,8 +432,8 @@
                     else {
                       var details = {};
                       for (detail in locked_section_details) {
-                        if (detail.section_name == sections[section]) {
-                          details = detail;
+                        if (locked_section_details[detail].section_name == sections[section]) {
+                          details = locked_section_details[detail];
                         }
                       }
 
@@ -442,8 +442,8 @@
 
                       var section_file_id = "";
                       for (sect in section_file_ids) {
-                        if (sect.section_name == sections[section]) {
-                          section_file_id = sect.section_file_id
+                        if (section_file_ids[sect].section_name == sections[section]) {
+                          section_file_id = section_file_ids[sect].section_file_id
                         }
                       }
                       if (section_file_id == "") {
