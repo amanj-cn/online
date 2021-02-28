@@ -3,7 +3,7 @@
  * L.WOPI contains WOPI related logic
  */
 
-/* global $ w2ui toolbarUpMobileItems _ */
+/* global $ w2ui _ */
 L.Map.WOPI = L.Handler.extend({
 	// If the CheckFileInfo call fails on server side, we won't have any PostMessageOrigin.
 	// So use '*' because we still needs to send 'close' message to the parent frame which
