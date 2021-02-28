@@ -344,8 +344,8 @@ L.Map.WOPI = L.Handler.extend({
 							// Add to our list of items to preserve when in mobile mode
 							// FIXME: Wrap the toolbar in a class so that we don't make use
 							// global variables and functions like this
-							var idx = toolbarUpMobileItems.indexOf(insertBefore);
-							toolbarUpMobileItems.splice(idx, 0, msg.Values.id);
+							// var idx = toolbarUpMobileItems.indexOf(insertBefore);
+							// toolbarUpMobileItems.splice(idx, 0, msg.Values.id);
 						}
 					}
 					else if (this._map.isPermissionReadOnly()) {
