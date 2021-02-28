@@ -127,7 +127,6 @@ link.setAttribute("href", '][m4_ifelse(MOBILEAPP,[],[%SERVICE_ROOT%/loleaflet/%V
 document.getElementsByTagName("head")[[0]].appendChild(link);
 </script>
 ])
-<!--%BRANDING_CSS%--> <!-- add your logo here -->
 m4_ifelse(IOSAPP,[true],
   [<link rel="stylesheet" href="Branding/branding.css">])
 m4_ifelse(ANDROIDAPP,[true],
@@ -330,6 +329,5 @@ m4_ifelse(MOBILEAPP,[true],
   [    <script src="%SERVICE_ROOT%/loleaflet/%VERSION%/bundle.js" defer></script>
   ])
 )m4_dnl
-    //<!--%BRANDING_JS%--> <!-- logo onclick handler -->
     <!--%CSS_VARIABLES%-->
 </body></html>
