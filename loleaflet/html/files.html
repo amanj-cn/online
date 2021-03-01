@@ -234,6 +234,7 @@
 
       function unlockSection(file_id, section, auth_code) {
         console.log("Unock Section function call - " + file_id + ", " + section);
+
         fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/" + section + "/unlock", {
           method: 'GET', // *GET, POST, PUT, DELETE, etc.
           mode: 'cors', // no-cors, *cors, same-origin
@@ -328,6 +329,25 @@
           if (msg.Values) {
             if (msg.Values.Modified == true) {
               document.getElementById("ModifiedStatus").innerHTML = "Modified";
+              fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/locked", {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + auth_code
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+              })
+              .then(response => response.json())
+              .then((out) => {
+                console.log(out);
+                var locked_sections = out["locked_sections"];
+                if (locked_sections.length > 0) {
+                  console.log("This document contains one or more locked sections. Force-saving any modifications immediately to avoid overwrite on merge.");
+                  save();
+                }
+              }).catch(err => console.error(err));
             }
             else {
               document.getElementById("ModifiedStatus").innerHTML = "Saved";
@@ -453,7 +473,7 @@
                       else {
                         var sectionLink = window.location.href;
                         sectionLink = sectionLink.replace(file_id, section_file_id);
-                        var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + ">" + open_icon + " Open</a></td></tr>";
+                        var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + " target='_blank'>" + open_icon + " Open</a></td></tr>";
                         lockModalHTML += addLinkHTML;
                       }
                     }
@@ -630,16 +650,16 @@
         alert('Incorrect usage, please open the file from the DevFolder console.');
       }
 
-      var protocol = "https:"
+      var protocol = "https:";
       var host = window.location.host;
       var port = window.location.port;
       host = host.replace(port, "9980");
       console.log("Iframe host = " + host);
-      var pathname = '/loleaflet/dist/loleaflet.html'
+      var pathname = '/loleaflet/dist/loleaflet.html';
       var file_id = window.location.search.substr(1);
       var access_token = getCookie("code");
-      var query = '?WOPISrc=' + WOPI_SRC + '/' + file_id + '&access_token=' + access_token + '&NotWOPIButIframe=true'
-      var path = protocol + '//' + host + pathname + query
+      var query = '?WOPISrc=' + WOPI_SRC + '/' + file_id + '&access_token=' + access_token + '&NotWOPIButIframe=true';
+      var path = protocol + '//' + host + pathname + query;
 
       var iframe = document.getElementById("frame");
       iframe.src = path;
