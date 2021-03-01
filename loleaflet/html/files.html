@@ -331,6 +331,8 @@
               document.getElementById("ModifiedStatus").innerHTML = "Modified";
 
               var file_id = window.location.search.substr(1);
+              var auth_code = getCookie("code");
+              
               fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/locked", {
                 method: 'GET', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
