@@ -348,7 +348,7 @@
                 var locked_sections = out["locked_sections"];
                 if (locked_sections.length > 0) {
                   console.log("This document contains one or more locked sections. Force-saving any modifications immediately to avoid overwrite on merge.");
-                  save();
+                  // save();
                 }
               }).catch(err => console.error(err));
             }
