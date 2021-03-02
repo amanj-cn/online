@@ -618,7 +618,7 @@
 
       var auth_code = getCookie("code");
       if (!auth_code) {
-        window.location.href = LOGIN_URL;
+        window.location.href = LOGIN_URL + "&state=" + window.location.search.substr(1);
       }
 
       var user_data = {
@@ -640,7 +640,7 @@
         console.log(response.status); // Will show the status
         if (!response.ok) {
             throw new Error("User Session HTTP status " + response.status);
-            window.location.href = LOGIN_URL;
+            window.location.href = LOGIN_URL + "&state=" + window.location.search.substr(1);
         }
         return response.json();
       })
