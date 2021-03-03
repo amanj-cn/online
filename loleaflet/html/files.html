@@ -331,30 +331,30 @@
             if (msg.Values.Modified == true) {
               document.getElementById("ModifiedStatus").innerHTML = "Modified";
 
-              var file_id = window.location.search.substr(1);
-              var auth_code = getCookie("code");
+              // var file_id = window.location.search.substr(1);
+              // var auth_code = getCookie("code");
 
-              if (templated) {
-                fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/locked", {
-                  method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                  mode: 'cors', // no-cors, *cors, same-origin
-                  credentials: 'same-origin', // include, *same-origin, omit
-                  headers: {
-                    'Content-Type': 'application/json',
-                  'Authorization': 'Bearer ' + auth_code
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                  }
-                })
-                .then(response => response.json())
-                .then((out) => {
-                  console.log(out);
-                  var locked_sections = out["locked_sections"];
-                  if (locked_sections.length > 0) {
-                    console.log("This document contains one or more locked sections. Force-saving any modifications immediately to avoid overwrite on merge.");
-                    save();
-                  }
-                }).catch(err => console.error(err));
-              }
+              // if (templated) {
+              //   fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/locked", {
+              //     method: 'GET', // *GET, POST, PUT, DELETE, etc.
+              //     mode: 'cors', // no-cors, *cors, same-origin
+              //     credentials: 'same-origin', // include, *same-origin, omit
+              //     headers: {
+              //       'Content-Type': 'application/json',
+              //     'Authorization': 'Bearer ' + auth_code
+              //       // 'Content-Type': 'application/x-www-form-urlencoded',
+              //     }
+              //   })
+              //   .then(response => response.json())
+              //   .then((out) => {
+              //     console.log(out);
+              //     var locked_sections = out["locked_sections"];
+              //     if (locked_sections.length > 0) {
+              //       console.log("This document contains one or more locked sections. Force-saving any modifications immediately to avoid overwrite on merge.");
+              //       save();
+              //     }
+              //   }).catch(err => console.error(err));
+              // }
             }
             else {
               document.getElementById("ModifiedStatus").innerHTML = "Saved";
