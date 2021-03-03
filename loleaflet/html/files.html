@@ -452,7 +452,7 @@
 
                     
                     if (locked_sections.indexOf(sections[section]) == -1) {
-                      var sectionHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + unlocked_icon + " Unlocked</td><td style='transform: rotate(0);'><a href='#' class='stretched-link' onclick='lockSection(\""
+                      var sectionHTML = "<tr><td scope='row'>" + sections[section] + "</td><td>" + unlocked_icon + " Unlocked</td><td style='transform: rotate(0);'><a href='#' class='stretched-link' data-dismiss='modal' onclick='lockSection(\""
                       + file_id + "\", \"" + sections[section] + "\", \"" + auth_code + "\")'>" + lock_icon + " Lock</a></td></tr>";
                       lockModalHTML += sectionHTML;
                     }
@@ -480,7 +480,7 @@
                       else {
                         var sectionLink = window.location.href;
                         sectionLink = sectionLink.replace(file_id, section_file_id);
-                        var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + " target='_blank'>" + open_icon + " Open</a></td></tr>";
+                        var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' data-dismiss='modal' href=" + sectionLink + " target='_blank'>" + open_icon + " Open</a></td></tr>";
                         lockModalHTML += addLinkHTML;
                       }
                     }
@@ -598,7 +598,7 @@
               <h4 class="col-12 modal-title text-center" id="unlockSectionModalTitle"></h4>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary" id="unlockSectionModalButton">Unlock</button>
+              <button type="button" class="btn btn-primary" id="unlockSectionModalButton" data-dismiss="modal">Unlock</button>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
             </div>
           </div>
