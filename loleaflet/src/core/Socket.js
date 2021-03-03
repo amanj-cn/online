@@ -581,53 +581,56 @@ L.Socket = L.Class.extend({
 			}
 			else if (command.errorKind === 'documentconflict')
 			{
-				var that = this;
-				storageError = errorMessages.storage.documentconflict;
+				// var that = this;
+				// storageError = errorMessages.storage.documentconflict;
 
-				vex.closeAll();
+				// vex.closeAll();
 
-				vex.dialog.open({
-					message: _('Document has been changed in storage. What would you like to do with your unsaved changes?'),
-					escapeButtonCloses: false,
-					overlayClosesOnClick: false,
-					buttons: [
-						$.extend({}, vex.dialog.buttons.YES, { text: _('Discard'),
-						                                      click: function() {
-							                                      this.value = 'discard';
-							                                      this.close();
-						                                      }}),
-						$.extend({}, vex.dialog.buttons.YES, { text: _('Overwrite'),
-						                                      click: function() {
-							                                      this.value = 'overwrite';
-							                                      this.close();
-						                                      }}),
-						$.extend({}, vex.dialog.buttons.YES, { text: _('Save to new file'),
-						                                      click: function() {
-							                                      this.value = 'saveas';
-							                                      this.close();
-						                                      }})
-					],
-					callback: function(value) {
-						if (value === 'discard') {
-							// They want to refresh the page and load document again for all
-							that.sendMessage('closedocument');
-						} else if (value === 'overwrite') {
-							// They want to overwrite
-							that.sendMessage('savetostorage force=1');
-						} else if (value === 'saveas') {
-							var filename = that._map['wopi'].BaseFileName;
-							if (filename) {
-								filename = L.LOUtil.generateNewFileName(filename, '_new');
-								that._map.saveAs(filename);
-							}
-						}
-					},
-					afterOpen: function() {
-						this.contentEl.style.width = '600px';
-					}
-				});
+				// vex.dialog.open({
+				// 	message: _('Document has been changed in storage. What would you like to do with your unsaved changes?'),
+				// 	escapeButtonCloses: false,
+				// 	overlayClosesOnClick: false,
+				// 	buttons: [
+				// 		$.extend({}, vex.dialog.buttons.YES, { text: _('Discard'),
+				// 		                                      click: function() {
+				// 			                                      this.value = 'discard';
+				// 			                                      this.close();
+				// 		                                      }}),
+				// 		$.extend({}, vex.dialog.buttons.YES, { text: _('Overwrite'),
+				// 		                                      click: function() {
+				// 			                                      this.value = 'overwrite';
+				// 			                                      this.close();
+				// 		                                      }}),
+				// 		$.extend({}, vex.dialog.buttons.YES, { text: _('Save to new file'),
+				// 		                                      click: function() {
+				// 			                                      this.value = 'saveas';
+				// 			                                      this.close();
+				// 		                                      }})
+				// 	],
+				// 	callback: function(value) {
+				// 		if (value === 'discard') {
+				// 			// They want to refresh the page and load document again for all
+				// 			that.sendMessage('closedocument');
+				// 		} else if (value === 'overwrite') {
+				// 			// They want to overwrite
+				// 			that.sendMessage('savetostorage force=1');
+				// 		} else if (value === 'saveas') {
+				// 			var filename = that._map['wopi'].BaseFileName;
+				// 			if (filename) {
+				// 				filename = L.LOUtil.generateNewFileName(filename, '_new');
+				// 				that._map.saveAs(filename);
+				// 			}
+				// 		}
+				// 	},
+				// 	afterOpen: function() {
+				// 		this.contentEl.style.width = '600px';
+				// 	}
+				// });
 
-				return;
+				// return;
+
+				msg = _('Document has changed in storage. Loading the new document. Your version is available as revision.');
+				showMsgAndReload = true;
 			}
 
 			// Skip empty errors (and allow for suppressing errors by making them blank).
@@ -641,6 +644,29 @@ L.Socket = L.Class.extend({
 
 				return;
 			}
+
+			if (showMsgAndReload) {
+				if (this._map._docLayer) {
+					this._map._docLayer.removeAllViews();
+				}
+				// Detach all the handlers from current socket, otherwise _onSocketClose tries to reconnect again
+				// However, we want to reconnect manually here.
+				this.close();
+
+				// Reload the document
+				this._map._active = false;
+				map = this._map;
+				clearTimeout(vex.timer);
+				vex.timer = setInterval(function() {
+					try {
+						// Activate and cancel timer and dialogs.
+						map._activate();
+					} catch (error) {
+						console.warn('Cannot activate map');
+					}
+				}, 3000);
+			}
+
 		}
 		else if (textMsg.startsWith('error:') && command.errorCmd === 'internal') {
 			this._map.hideBusy();

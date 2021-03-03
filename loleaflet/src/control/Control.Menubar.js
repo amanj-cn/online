@@ -1116,7 +1116,7 @@ L.Control.Menubar = L.Control.extend({
 		$('#main-menu').attr('tabindex', 0);
 
 
-		this._createFileIcon();
+		// this._createFileIcon();
 	},
 
 	_onStyleMenu: function (e) {
