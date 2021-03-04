@@ -369,14 +369,14 @@
                 }
               })
               .then(response => response.json())
-              .then((out) => {
+              .then(async (out) => {
                 var isEnrichedSection = out["enriched_section"];
                 console.log("Enriched Section - " + isEnrichedSection);
                 if (isEnrichedSection == true) {
                   insertUnlockButton();
                   var main_file_name = out["main_file_name"];
                   document_name = main_file_name + " (Locked ";
-                  fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/editable", {
+                  await fetch(BACKEND_DOMAIN + "/files/" + file_id + "/sections/editable", {
                     method: 'GET', // *GET, POST, PUT, DELETE, etc.
                     mode: 'cors', // no-cors, *cors, same-origin
                     credentials: 'same-origin', // include, *same-origin, omit
@@ -393,14 +393,13 @@
                     document_name += section + ")"
                   }).catch(err => console.error(err));
                 }
+                if (document_name.length > MAX_DOCUMENT_TITLE_LENGTH) {
+                  document_name = document_name.substring(0, MAX_DOCUMENT_TITLE_LENGTH);
+                  document_name += "...";
+                }
+                document.getElementById("document-title").innerHTML = document_name;
+                console.log("Document name - " + document_name);
               }).catch(err => console.error(err));
-
-              if (document_name.length > MAX_DOCUMENT_TITLE_LENGTH) {
-                document_name = document_name.substring(0, MAX_DOCUMENT_TITLE_LENGTH);
-                document_name += "...";
-              }
-              document.getElementById("document-title").innerHTML = document_name;
-              console.log("Document name - " + document_name);
             }
           }
         } else if (msg.MessageId == 'Doc_ModifiedStatus') {
