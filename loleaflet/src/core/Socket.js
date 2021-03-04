@@ -475,11 +475,11 @@ L.Socket = L.Class.extend({
 
 			if (showMsgAndReload) {
 				if (this._map._docLayer) {
-					console.log("Removing all views");
+					console.log('Removing all views');
 					this._map._docLayer.removeAllViews();
 				}
 				else {
-					console.log("Doc layer not found");
+					console.log('Doc layer not found');
 				}
 				// Detach all the handlers from current socket, otherwise _onSocketClose tries to reconnect again
 				// However, we want to reconnect manually here.
