@@ -245,7 +245,7 @@
           }
         })
         .then(response => response.json())
-        .then((out) => {
+        .then(async (out) => {
           var main_doc_id = out['main_doc_id']
           var cloned_doc_id = out['cloned_doc_id']
 
@@ -253,14 +253,13 @@
           newLink = newLink.replace(main_doc_id, cloned_doc_id);
           
           var oldPage = window.location;
-          window.open(newLink);
-          setTimeout(() => {  
-            window.frames[0].postMessage(JSON.stringify({
-              'MessageId': 'Action_Close'
-            }),
-            '*');
-            oldPage.reload(); 
-          }, 2000);
+          var oldFrame = window.frames[0];
+          await window.open(newLink);
+          oldFrame.postMessage(JSON.stringify({
+            'MessageId': 'Action_Close'
+          }),
+          '*');
+          oldPage.reload(); 
         }).catch(err => console.error(err));
       }
 
