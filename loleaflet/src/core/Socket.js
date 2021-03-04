@@ -560,6 +560,7 @@ L.Socket = L.Class.extend({
 
 			this._map.hideBusy();
 			var storageError;
+			var showMsgAndReload = false;
 			if (command.errorKind === 'savediskfull') {
 				storageError = errorMessages.storage.savediskfull;
 			}
@@ -629,7 +630,7 @@ L.Socket = L.Class.extend({
 
 				// return;
 
-				msg = _('Document has changed in storage. Loading the new document. Your version is available as revision.');
+				msg = _('This document has been changed in storage. Your unsaved changes may be lost. Loading the new version now, apologies for the inconvenience!');
 				showMsgAndReload = true;
 			}
 
