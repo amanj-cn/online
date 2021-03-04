@@ -251,15 +251,16 @@
 
           var newLink = window.location.href;
           newLink = newLink.replace(main_doc_id, cloned_doc_id);
-
-          window.frames[0].postMessage(JSON.stringify({
-            'MessageId': 'Action_Close'
-          }),
-          '*');
           
           var oldPage = window.location;
           window.open(newLink);
-          setTimeout(() => {  oldPage.reload(); }, 2000);
+          setTimeout(() => {  
+            window.frames[0].postMessage(JSON.stringify({
+              'MessageId': 'Action_Close'
+            }),
+            '*');
+            oldPage.reload(); 
+          }, 2000);
         }).catch(err => console.error(err));
       }
 
