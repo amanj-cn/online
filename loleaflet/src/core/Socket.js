@@ -525,6 +525,7 @@ L.Socket = L.Class.extend({
 					return false;
 				};
 				dialogOptions.afterClose = restartConnectionFn;
+				this._map.remove();
 			}
 
 			var dialogOpened = vex.dialog.open(dialogOptions);
@@ -561,6 +562,8 @@ L.Socket = L.Class.extend({
 			this._map.hideBusy();
 			var storageError;
 			var showMsgAndReload = false;
+			msg = '';
+			var postMsgData = {};
 			if (command.errorKind === 'savediskfull') {
 				storageError = errorMessages.storage.savediskfull;
 			}
@@ -667,6 +670,56 @@ L.Socket = L.Class.extend({
 					}
 				}, 3000);
 			}
+
+			// Close any open dialogs first.
+			vex.closeAll();
+
+			var message = '';
+			if (!this._map['wopi'].DisableInactiveMessages) {
+				message = msg;
+			}
+
+			var dialogOptions = {
+				message: message,
+				contentClassName: 'loleaflet-user-idle'
+			};
+
+			var restartConnectionFn;
+			if (textMsg === 'idle' || textMsg === 'oom') {
+				var map = this._map;
+				restartConnectionFn = function() {
+					if (map._documentIdle)
+					{
+						console.debug('idleness: reactivating');
+						map._documentIdle = false;
+						map._docLayer._setCursorVisible();
+						// force reinitialization of calcInputBar(formulabar)
+						if (map.dialog._calcInputBar)
+							map.dialog._calcInputBar.id = null;
+						return map._activate();
+					}
+					return false;
+				};
+				dialogOptions.afterClose = restartConnectionFn;
+			}
+
+			var dialogOpened = vex.dialog.open(dialogOptions);
+
+			if (textMsg === 'idle' || textMsg === 'oom') {
+				dialogOpened.contentEl.onclick = restartConnectionFn;
+				$('.vex-overlay').addClass('loleaflet-user-idle-overlay');
+			}
+
+			if (postMsgData['Reason']) {
+				// Tell WOPI host about it which should handle this situation
+				this._map.fire('postMessage', {msgId: 'Session_Closed', args: postMsgData});
+			}
+
+			if (textMsg === 'ownertermination') {
+				this._map.remove();
+			}
+
+			return;
 
 		}
 		else if (textMsg.startsWith('error:') && command.errorCmd === 'internal') {
