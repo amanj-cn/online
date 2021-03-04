@@ -275,7 +275,7 @@ L.Socket = L.Class.extend({
 			     'background:#ddf;color:black', color, 'color:black');
 	},
 
-	_onMessage: function (e) {
+	_onMessage: async function (e) {
 		var imgBytes, index, textMsg, img;
 
 		if (typeof (e.data) === 'string') {
@@ -475,11 +475,15 @@ L.Socket = L.Class.extend({
 
 			if (showMsgAndReload) {
 				if (this._map._docLayer) {
-					this._map._docLayer.removeAllViews();
+					console.log("Removing all views");
+					await this._map._docLayer.removeAllViews();
+				}
+				else {
+					console.log("Doc layer not found");
 				}
 				// Detach all the handlers from current socket, otherwise _onSocketClose tries to reconnect again
 				// However, we want to reconnect manually here.
-				this.close();
+				await this.close();
 
 				// Reload the document
 				this._map._active = false;
