@@ -462,7 +462,8 @@ L.Socket = L.Class.extend({
 			}
 			else if (textMsg.startsWith('documentconflict')) {
 				msg = _('Document has changed in storage. Loading the new document. Your version is available as revision.');
-				showMsgAndReload = true;
+				// showMsgAndReload = true;
+				this.sendMessage('closedocument');
 			}
 			else if (textMsg.startsWith('versionrestore:')) {
 				textMsg = textMsg.substring('versionrestore:'.length).trim();
@@ -638,7 +639,7 @@ L.Socket = L.Class.extend({
 				// return;
 
 				msg = _('This document has been changed in storage. Your unsaved changes may be lost. Loading the new version now, apologies for the inconvenience!');
-				showMsgAndReload = true;
+				this.sendMessage('closedocument');
 			}
 
 			// Skip empty errors (and allow for suppressing errors by making them blank).
@@ -653,77 +654,77 @@ L.Socket = L.Class.extend({
 				return;
 			}
 
-			if (showMsgAndReload) {
-				if (this._map._docLayer) {
-					this._map._docLayer.removeAllViews();
-				}
-				// Detach all the handlers from current socket, otherwise _onSocketClose tries to reconnect again
-				// However, we want to reconnect manually here.
-				this.close();
+			// if (showMsgAndReload) {
+			// 	if (this._map._docLayer) {
+			// 		this._map._docLayer.removeAllViews();
+			// 	}
+			// 	// Detach all the handlers from current socket, otherwise _onSocketClose tries to reconnect again
+			// 	// However, we want to reconnect manually here.
+			// 	this.close();
 
-				// Reload the document
-				this._map._active = false;
-				map = this._map;
-				clearTimeout(vex.timer);
-				vex.timer = setInterval(function() {
-					try {
-						// Activate and cancel timer and dialogs.
-						map._activate();
-					} catch (error) {
-						console.warn('Cannot activate map');
-					}
-				}, 3000);
-			}
+			// 	// Reload the document
+			// 	this._map._active = false;
+			// 	map = this._map;
+			// 	clearTimeout(vex.timer);
+			// 	vex.timer = setInterval(function() {
+			// 		try {
+			// 			// Activate and cancel timer and dialogs.
+			// 			map._activate();
+			// 		} catch (error) {
+			// 			console.warn('Cannot activate map');
+			// 		}
+			// 	}, 3000);
+			// }
 
-			// Close any open dialogs first.
-			vex.closeAll();
+			// // Close any open dialogs first.
+			// vex.closeAll();
 
-			var message = '';
-			if (!this._map['wopi'].DisableInactiveMessages) {
-				message = msg;
-			}
+			// var message = '';
+			// if (!this._map['wopi'].DisableInactiveMessages) {
+			// 	message = msg;
+			// }
 
-			var dialogOptions = {
-				message: message,
-				contentClassName: 'loleaflet-user-idle'
-			};
+			// var dialogOptions = {
+			// 	message: message,
+			// 	contentClassName: 'loleaflet-user-idle'
+			// };
 
-			var restartConnectionFn;
-			if (textMsg === 'idle' || textMsg === 'oom') {
-				var map = this._map;
-				restartConnectionFn = function() {
-					if (map._documentIdle)
-					{
-						console.debug('idleness: reactivating');
-						map._documentIdle = false;
-						map._docLayer._setCursorVisible();
-						// force reinitialization of calcInputBar(formulabar)
-						if (map.dialog._calcInputBar)
-							map.dialog._calcInputBar.id = null;
-						return map._activate();
-					}
-					return false;
-				};
-				dialogOptions.afterClose = restartConnectionFn;
-			}
+			// var restartConnectionFn;
+			// if (textMsg === 'idle' || textMsg === 'oom') {
+			// 	var map = this._map;
+			// 	restartConnectionFn = function() {
+			// 		if (map._documentIdle)
+			// 		{
+			// 			console.debug('idleness: reactivating');
+			// 			map._documentIdle = false;
+			// 			map._docLayer._setCursorVisible();
+			// 			// force reinitialization of calcInputBar(formulabar)
+			// 			if (map.dialog._calcInputBar)
+			// 				map.dialog._calcInputBar.id = null;
+			// 			return map._activate();
+			// 		}
+			// 		return false;
+			// 	};
+			// 	dialogOptions.afterClose = restartConnectionFn;
+			// }
 
-			var dialogOpened = vex.dialog.open(dialogOptions);
+			// var dialogOpened = vex.dialog.open(dialogOptions);
 
-			if (textMsg === 'idle' || textMsg === 'oom') {
-				dialogOpened.contentEl.onclick = restartConnectionFn;
-				$('.vex-overlay').addClass('loleaflet-user-idle-overlay');
-			}
+			// if (textMsg === 'idle' || textMsg === 'oom') {
+			// 	dialogOpened.contentEl.onclick = restartConnectionFn;
+			// 	$('.vex-overlay').addClass('loleaflet-user-idle-overlay');
+			// }
 
-			if (postMsgData['Reason']) {
-				// Tell WOPI host about it which should handle this situation
-				this._map.fire('postMessage', {msgId: 'Session_Closed', args: postMsgData});
-			}
+			// if (postMsgData['Reason']) {
+			// 	// Tell WOPI host about it which should handle this situation
+			// 	this._map.fire('postMessage', {msgId: 'Session_Closed', args: postMsgData});
+			// }
 
-			if (textMsg === 'ownertermination') {
-				this._map.remove();
-			}
+			// if (textMsg === 'ownertermination') {
+			// 	this._map.remove();
+			// }
 
-			return;
+			// return;
 
 		}
 		else if (textMsg.startsWith('error:') && command.errorCmd === 'internal') {
