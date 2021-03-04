@@ -251,6 +251,11 @@
 
           var newLink = window.location.href;
           newLink = newLink.replace(main_doc_id, cloned_doc_id);
+
+          window.frames[0].postMessage(JSON.stringify({
+            'MessageId': 'Action_Close'
+          }),
+          '*');
           
           var oldPage = window.location;
           window.open(newLink);
@@ -659,7 +664,7 @@
               className="d-inline-block align-top"
               height="40"
           />&nbsp; DevFolder</a>
-          <span id="document-title" style="display: table; margin: 0 100px 0 auto; width: -webkit-fill-available; width: -moz-available; font-size: 1.5rem;"></span>
+          <span id="document-title" style="display: table; margin: 0 100px 0 auto; width: -webkit-fill-available; width: -moz-available; font-size: 1.25rem;"></span>
           <div class="navbar-nav ml-auto">
             <div class="dropdown">
               <button class="btn btn-primary dropdown-toggle idyLT" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
