@@ -13,6 +13,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>DevFolder</title>
     <style>
       .alert {
@@ -21,6 +22,28 @@
       background-color: #f44336;
       color: white;
       margin-bottom: 15px;
+      }
+      .idyLT {
+        border-radius: 31px;
+        border: 1px solid #291c88;
+        box-shadow: none;
+        letter-spacing: 0.5px;
+        background: #fff;
+        color: #291c88;
+      }
+      .idyLT:hover {
+      background: #291c88;
+      color: #fff;
+      }
+      .dropdown-item:hover, .dropdown-item:focus {
+        color: #16181b;
+        text-decoration: none;
+        background-color: #e9ecef;
+      }
+      .dropdown-item:active {
+        color: #fff;
+        text-decoration: none;
+        background-color: #007bff;
       }
     </style>
     <!-- jQuery -->
@@ -33,7 +56,9 @@
     <script>
       const BACKEND_DOMAIN = "https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev";
       const LOGIN_URL = "https://workdocstesting.auth.us-east-1.amazoncognito.com/login?client_id=2fdg0c2ekmj06bsi88qfivikl5&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=https://ec2-18-212-165-175.compute-1.amazonaws.com:1234/";
-      const WOPI_SRC = "https://1ci2s4be49.execute-api.us-east-1.amazonaws.com/dev/wopi/files";
+      const WOPI_SRC = BACKEND_DOMAIN + "/wopi/files";
+      const DRIVE_URL = "https://ec2-18-212-165-175.compute-1.amazonaws.com:1234";
+      
       var templated = false;
 
       function post(msg) {
@@ -285,6 +310,23 @@
               var auth_code = getCookie("code");
 
               var file_id = window.location.search.substr(1);
+
+              fetch(BACKEND_DOMAIN + "/files/" + file_id, {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + auth_code
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+              })
+              .then(response => response.json())
+              .then((out) => {
+                name = out["Metadata"]["LatestVersionMetadata"]["Name"];
+                // if __S then xyz
+                document.getElementById("document-title").innerHTML = name;
+              }).catch(err => console.error(err));
               
               fetch(BACKEND_DOMAIN + "/files/" + file_id + "/enriched", {
                 method: 'GET', // *GET, POST, PUT, DELETE, etc.
@@ -609,19 +651,92 @@
     </div>
 
     <div style="width: 100%; height: 100%; position: fixed; top:0px">
-      <nav class="navbar navbar-light" style="background-color: #f1f1f1; height:70px">
-        <a class="navbar-brand" href="/" style="font-size:1.5rem">
+      <nav class="navbar navbar-light navbar-expand" style="background-color: #f1f1f1; height:70px; text-align: center;">
+        <a class="navbar-brand" href="/" id="devfolder-logo" style="font-size:1.5rem">
           <img
               src="images/logo.png"
               alt="DevFolder"
               className="d-inline-block align-top"
               height="40"
           />&nbsp; DevFolder</a>
+          <span id="document-title" style="display: table; margin: 0 100px 0 auto; width: -webkit-fill-available; width: -moz-available; font-size: 1.5rem;"></span>
+          <div class="navbar-nav ml-auto">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle idyLT" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-user-circle" aria-hidden="true" style="font-size: 24px; margin-right: -.255rem; position: relative; top: 2px;"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#" onclick="handleLogout()">Logout</a>
+              </div>
+            </div>
+          </div>
       </nav>
 
       <iframe id="frame" style="position:relative; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;">Sorry, your browser doesn't support iframes.</iframe>
     </div>
     <script>
+      document.getElementById("devfolder-logo").href = DRIVE_URL + "/";
+      
+      const makeRequestWithoutBody = (path, method) =>
+        new Promise(async (resolve, reject) => {
+          try {
+            const cookie = await getCookie("code")
+            console.log("COOKIEEEE : ", cookie)
+            let response = await fetch(BACKEND_DOMAIN + path, {
+              method,
+              mode: "cors",
+              headers: {
+                'Authorization': 'Bearer '+ cookie
+              },
+              credentials: "same-origin",
+            });
+            if (response.ok) {
+              try {
+                const body = await response.json();
+                return resolve(body);
+              } catch (err) {
+                return resolve();
+              }
+            } else if (response.status === 401) {
+              reject({
+                status: response.status,
+                message: "Please login or check credentials",
+              });
+              // alert("You need to be signed in for this action.");
+              // window.location.href = SIGNIN_URL
+              // initiateLogin();
+            } else {
+              const message = await response.text();
+              // alert("Authentication Token Expired !!.");
+              alert(`Status : ${response.status}. Message : ${message}`)
+              // window.location.href = "/"
+              reject({
+                status: response.status,
+                message,
+              });
+            }
+          } catch (err) {
+            console.log("ERROR")
+            reject({ message: "Network error", cause: err });
+          }
+        });
+
+      function eraseCookie(name) {   
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      }
+
+      async function handleLogout(){
+        console.log("Logged out !!")
+        const code = await getCookie("code")
+        let path = "/users/session/" + code
+        makeRequestWithoutBody(path,"DELETE").then(
+          response => {
+            eraseCookie("code")
+            window.location.href = LOGIN_URL;
+          }
+        )
+      }
+
       function getParameterByName(name, url = window.location.href) {
         name = name.replace(/[\[\]]/g, '\\$&');
         var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),

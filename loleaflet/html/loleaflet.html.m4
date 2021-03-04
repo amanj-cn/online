@@ -166,14 +166,14 @@ m4_ifelse(MOBILEAPP,[true],
        <!-- Mobile menu toggle button (hamburger/x icon) -->
        <input id="main-menu-state" type="checkbox" style="display: none"/>
        <ul id="main-menu" class="sm sm-simple lo-menu readonly"></ul>
-       <div id="document-titlebar">
+       <!-- <div id="document-titlebar">
          <div class="document-title">
-           <!-- visuallyhidden: hide it visually but keep it available to screen reader and other assistive technology -->
+           visuallyhidden: hide it visually but keep it available to screen reader and other assistive technology
            <label class="visuallyhidden" for="document-name-input" aria-hidden="false"></label>
            <input id="document-name-input" type="text" disabled="true" style="display: none"/>
            <div id="document-title-pencil" style="display: none"></div>
          </div>
-       </div>
+       </div> -->
      </nav>
 
      <table id="toolbar-wrapper">
