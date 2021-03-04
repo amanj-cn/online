@@ -528,7 +528,7 @@
                       else {
                         var sectionLink = window.location.href;
                         sectionLink = sectionLink.replace(file_id, section_file_id);
-                        var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' data-dismiss='modal' href=" + sectionLink + " target='_blank'>" + open_icon + " Open</a></td></tr>";
+                        var addLinkHTML = "<td style='transform: rotate(0);'><a class='stretched-link' href=" + sectionLink + " target='_blank'>" + open_icon + " Open</a></td></tr>";
                         lockModalHTML += addLinkHTML;
                       }
                     }
@@ -647,7 +647,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" id="unlockSectionModalButton" data-dismiss="modal">Unlock</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-secondary">Cancel</button>
             </div>
           </div>
           
